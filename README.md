@@ -91,10 +91,3 @@ lib/
 
 Standard Next.js app — deployable to any Node-compatible host with zero
 additional configuration.
-
-## Roadmap
-
-- Pricing page (pending confirmed per-message rates)
-- API reference page (pending a stable public API)
-- Testimonials / social proof section (pending pilot clients)
-- Blog / content hub for longer-form SEO and GEO content
