@@ -7,7 +7,7 @@ Router), TypeScript, and Tailwind CSS, with SEO, AEO (answer engines), and GEO
 
 ## Stack
 
-- **Framework:** Next.js 14 (App Router)
+- **Framework:** Next.js 16 (App Router)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
 - **Fonts:** Space Grotesk (display), Inter (body), IBM Plex Mono (technical/data),
