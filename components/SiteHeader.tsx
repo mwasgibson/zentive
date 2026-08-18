@@ -13,7 +13,7 @@ const navItems = [
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-paper/90 backdrop-blur">
-      <div className="flex h-16 w-full items-center justify-between px-4 sm:px-8">
+      <div className="flex h-16 w-full items-center justify-between px-4 sm:px-8 relative">
         <a href="#top" className="group relative inline-flex items-center">
           <div className="relative rounded-2xl rounded-bl-sm bg-ink px-3.5 py-1.5 text-paper shadow-sm transition-transform group-hover:scale-[1.02]">
             <span className="font-display text-lg font-bold tracking-tight text-paper">
@@ -21,7 +21,10 @@ export function SiteHeader() {
             </span>
           </div>
         </a>
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Primary">
+        <nav
+          className="hidden items-center gap-8 md:flex absolute left-1/2 -translate-x-1/2"
+          aria-label="Primary"
+        >
           {navItems.map((item) => (
             <a
               key={item.href}
