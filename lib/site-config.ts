@@ -1,5 +1,5 @@
 /**
- * SITE CONFIG — edit this file first.
+ * SITE CONFIG
  *
  * Values marked "ASSUMED" below are my best default, not a confirmed fact —
  * confirm or correct them, they're the only ones that were guessed.
