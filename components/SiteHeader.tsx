@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { siteConfig } from "@/lib/site-config";
- 
+
 const navItems = [
   { href: "#platform", label: "Platform" },
   { href: "#security", label: "Security" },
   { href: "#how-it-works", label: "How it works" },
   { href: "#use-cases", label: "Use cases" },
   { href: "#faq", label: "FAQ" },
-  {href: "#contact", label: "Contact" },
+  { href: "#contact", label: "Contact" },
 ];
 
 export function SiteHeader() {
@@ -32,9 +32,6 @@ export function SiteHeader() {
             </a>
           ))}
         </nav>
-        <a href={`mailto:${siteConfig.contactEmail}`} className="btn-primary">
-          Request early access
-        </a>
       </div>
     </header>
   );
