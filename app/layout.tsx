@@ -1,49 +1,73 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
-import { siteConfig } from "@/lib/site-config";
+import { getSiteConfig } from "@/lib/cms";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const grotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-grotesk", display: "swap" });
-const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono", display: "swap" });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+const grotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-grotesk",
+  display: "swap",
+});
+const mono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.domain),
-  title: {
-    default: `${siteConfig.productName} — ${siteConfig.tagline}`,
-    template: `%s — ${siteConfig.productName}`,
-  },
-  description:
-    "Send bulk SMS in Kenya over a direct SMPP connection to the MNO — no aggregator hop, no aggregator markup. CAK-compliant sender-ID governance, real-time delivery reports, and a prepaid wallet built for local businesses.",
-  keywords: [
-    "bulk SMS Kenya",
-    "SMPP Kenya",
-    "Safaricom SMS API",
-    "A2P messaging Kenya",
-    "SMS gateway Kenya",
-    "CAK compliant SMS",
-  ],
-  openGraph: {
-    type: "website",
-    locale: "en_KE",
-    url: siteConfig.domain,
-    siteName: siteConfig.productName,
-    title: `${siteConfig.productName} — ${siteConfig.tagline}`,
-    description:
-      "Direct SMPP connection to the MNO. No aggregator hop. CAK-compliant, Kenya-built bulk SMS.",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${siteConfig.productName} — ${siteConfig.tagline}`,
-    description:
-      "Direct SMPP connection to the MNO. No aggregator hop. CAK-compliant, Kenya-built bulk SMS.",
-  },
-  alternates: {
-    canonical: siteConfig.domain,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const siteConfig = await getSiteConfig();
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return {
+    metadataBase: new URL(siteConfig.domain),
+    title: {
+      default: `${siteConfig.productName} — ${siteConfig.tagline}`,
+      template: `%s — ${siteConfig.productName}`,
+    },
+    description:
+      "Send bulk SMS in Kenya over a direct SMPP connection to the MNO — no aggregator hop, no aggregator markup. CAK-compliant sender-ID governance, real-time delivery reports, and a prepaid wallet built for local businesses.",
+    keywords: [
+      "bulk SMS Kenya",
+      "SMPP Kenya",
+      "Safaricom SMS API",
+      "Airtel SMS API",
+      "A2P messaging Kenya",
+      "SMS gateway Kenya",
+      "CAK compliant SMS",
+    ],
+    openGraph: {
+      type: "website",
+      locale: "en_KE",
+      url: siteConfig.domain,
+      siteName: siteConfig.productName,
+      title: `${siteConfig.productName} — ${siteConfig.tagline}`,
+      description:
+        "Direct SMPP connection to the MNO. No aggregator hop. CAK-compliant, Kenya-built bulk SMS.",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${siteConfig.productName} — ${siteConfig.tagline}`,
+      description:
+        "Direct SMPP connection to the MNO. No aggregator hop. CAK-compliant, Kenya-built bulk SMS.",
+    },
+    alternates: {
+      canonical: siteConfig.domain,
+    },
+  };
+}
+
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const siteConfig = await getSiteConfig();
+
   const organizationLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -76,7 +100,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en-KE">
-      <body className={`${inter.variable} ${grotesk.variable} ${mono.variable}`}>
+      <body
+        className={`${inter.variable} ${grotesk.variable} ${mono.variable}`}
+      >
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationLd) }}

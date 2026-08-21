@@ -1,8 +1,7 @@
-import { siteConfig } from "@/lib/site-config";
-
-export const dynamic = "force-static";
+import { getSiteConfig } from "@/lib/cms";
 
 export async function GET() {
+  const siteConfig = await getSiteConfig();
   const body = `# ${siteConfig.productName}
 
 > ${siteConfig.tagline}. A directly-operated bulk SMS platform serving the Kenyan market,
@@ -43,6 +42,7 @@ and data handling in one place rather than passing through a reseller hop.
 
 ## Pages
 - Homepage: ${siteConfig.domain}/
+- Blog: ${siteConfig.domain}/blog
 `;
 
   return new Response(body, {
