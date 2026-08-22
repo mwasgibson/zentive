@@ -557,6 +557,27 @@ const pageContentFallback: PageContent = {
   },
 };
 
+/**
+ * True if every string in this value is blank and every array is empty —
+ * i.e. the section technically has content, but nothing a visitor would
+ * actually see. Distinct from "genuinely missing," which cmsFetch already
+ * handles by returning null.
+ *
+ * This exists because a CMS response of `{}` or `{ heading: "", bullets: [] }`
+ * is still a truthy object — without this check, an accidentally-emptied
+ * section in the admin renders as a blank section on the live site instead
+ * of falling back to the default copy, which is exactly the bug this fixes.
+ */
+function isDeeplyEmpty(value: unknown): boolean {
+  if (value == null) return true;
+  if (typeof value === "string") return value.trim() === "";
+  if (Array.isArray(value)) return value.length === 0;
+  if (typeof value === "object") {
+    return Object.values(value as Record<string, unknown>).every(isDeeplyEmpty);
+  }
+  return false; // numbers, booleans, etc. count as meaningful content
+}
+
 export async function getPageContent(): Promise<PageContent> {
   const cms = await cmsFetch<Partial<Record<keyof PageContent, unknown>>>(
     "/api/v1/public/page-content",
@@ -565,12 +586,17 @@ export async function getPageContent(): Promise<PageContent> {
   // Each section falls back independently — a CMS that only has 3 of the 9
   // sections filled in still renders the other 6 correctly from defaults,
   // rather than the whole page falling back just because one key is empty.
+  // "Falls back" means: missing entirely, OR present but deeply empty
+  // (every field blank) — a partial edit that leaves *some* real content
+  // is respected as-is, even if it renders sparser than the default.
   const keys = Object.keys(pageContentFallback) as (keyof PageContent)[];
   const result = {} as PageContent;
   for (const key of keys) {
     const value = cms?.[key];
-    (result as unknown as Record<string, unknown>)[key] =
-      value && typeof value === "object" ? value : pageContentFallback[key];
+    const useValue = value && typeof value === "object" && !isDeeplyEmpty(value);
+    (result as unknown as Record<string, unknown>)[key] = useValue
+      ? value
+      : pageContentFallback[key];
   }
   return result;
 }

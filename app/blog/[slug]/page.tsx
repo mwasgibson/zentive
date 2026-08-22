@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { SiteHeader } from "../../../components/SiteHeader";
-import { SiteFooter } from "../../../components/SiteFooter";
-import { getBlogPost, getSiteConfig } from "../../../lib/cms";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { getBlogPost, getSiteConfig } from "@/lib/cms";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
