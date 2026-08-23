@@ -12,10 +12,17 @@ async function cmsFetch<T>(path: string): Promise<T | null> {
     const res = await fetch(`${CMS_API_URL}${path}`, {
       next: { revalidate: REVALIDATE_SECONDS },
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error(`[cms] ${CMS_API_URL}${path} returned ${res.status}, falling back`);
+      return null;
+    }
     return (await res.json()) as T;
-  } catch {
+  } catch (err) {
     // CMS unreachable (down, network issue, wrong URL) — caller falls back.
+    // Logged rather than swallowed silently: a misconfigured CMS_API_URL or
+    // a CMS that isn't running looks identical to a real outage from here,
+    // and both were previously indistinguishable from "the CMS has no data."
+    console.error(`[cms] fetch failed for ${CMS_API_URL}${path}, falling back:`, err);
     return null;
   }
 }
