@@ -3,6 +3,7 @@ import { FaqItem } from "@/components/FaqItem";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SecurityIcon } from "@/components/Securityicon";
+import { Reveal } from "@/components/Reveal";
 import {
   getSiteConfig,
   getFaqs,
@@ -76,6 +77,7 @@ export default async function HomePage() {
         </section>
 
         {/* PLATFORM / FEATURES */}
+        <Reveal>
         <section
           id="platform"
           className="border-t border-border bg-surface py-20"
@@ -110,8 +112,10 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        </Reveal>
 
         {/* SECURITY & COMPLIANCE */}
+        <Reveal>
         <section
           id="security"
           className="border-t border-border bg-ink py-16 text-paper"
@@ -142,8 +146,10 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        </Reveal>
 
         {/* GLOSSARY — answer-first blocks for AEO/GEO */}
+        <Reveal>
         <section className="border-t border-border bg-surface py-16">
           <div className="section">
             <p className="eyebrow">In plain terms</p>
@@ -161,8 +167,10 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        </Reveal>
 
         {/* HOW IT WORKS */}
+        <Reveal>
         <section id="how-it-works" className="py-20">
           <div className="section">
             <p className="eyebrow">How it works</p>
@@ -209,8 +217,10 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        </Reveal>
 
         {/* FOR ENGINEERING TEAMS */}
+        <Reveal>
         <section className="border-t border-border bg-surface py-20">
           <div className="section grid gap-12 lg:grid-cols-2 lg:items-center">
             <div>
@@ -263,8 +273,10 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        </Reveal>
 
         {/* BY THE NUMBERS */}
+        <Reveal>
         <section className="border-t border-border py-16">
           <div className="section">
             <p className="eyebrow">By the numbers</p>
@@ -280,8 +292,10 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        </Reveal>
 
         {/* USE CASES */}
+        <Reveal>
         <section
           id="use-cases"
           className="border-y border-border bg-ink py-20 text-paper"
@@ -325,8 +339,10 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        </Reveal>
 
         {testimonials.length > 0 && (
+          <Reveal>
           <section id="testimonials" className="py-20">
             <div className="section">
               <p className="eyebrow">What clients say</p>
@@ -368,9 +384,11 @@ export default async function HomePage() {
               </div>
             </div>
           </section>
+          </Reveal>
         )}
 
         {/* FAQ */}
+        <Reveal>
         <section id="faq" className="py-20">
           <div className="section grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
@@ -396,8 +414,10 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        </Reveal>
 
         {/* FINAL CTA */}
+        <Reveal>
         <section className="border-t border-border bg-surface py-20">
           <div className="section flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
             <div>
@@ -414,6 +434,7 @@ export default async function HomePage() {
             </a>
           </div>
         </section>
+        </Reveal>
       </main>
       <SiteFooter />
     </>

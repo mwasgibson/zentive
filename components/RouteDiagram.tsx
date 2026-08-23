@@ -34,6 +34,12 @@ export function RouteDiagram() {
         <line x1="0" y1="182" x2="230" y2="182" />
         <line x1="258" y1="182" x2="480" y2="182" />
       </g>
+      <circle
+        cy="182"
+        r="4"
+        className="fill-signal-dark"
+        style={{ animation: "route-pulse 3.5s ease-in-out infinite" }}
+      />
       <Node x={0} y={182} label="You" accent />
       <Node x={244} y={182} label="SMSC" sub="Safaricom" accent />
       <Node x={480} y={182} label="Handset" accent />

@@ -27,6 +27,12 @@ module.exports = {
       maxWidth: {
         content: "1180px",
       },
+      transitionDuration: {
+        instant: "150ms",
+        fast: "200ms",
+        normal: "300ms",
+        slow: "500ms",
+      },
     },
   },
   plugins: [require("@tailwindcss/typography")],
