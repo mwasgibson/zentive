@@ -252,35 +252,8 @@
    API / TERMINAL MOTION
    ========================================================= */
 
-.api-row.is-visible {
-  animation: api-row-enter 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.api-row:nth-child(1) {
-  animation-delay: 80ms;
-}
-
-.api-row:nth-child(2) {
-  animation-delay: 140ms;
-}
-
-.api-row:nth-child(3) {
-  animation-delay: 200ms;
-}
-
-.api-row:nth-child(4) {
-  animation-delay: 260ms;
-}
-
-.api-row:nth-child(5) {
-  animation-delay: 320ms;
-}
-
-.api-row:nth-child(6) {
-  animation-delay: 380ms;
-}
-
-.api-row {
+/* Terminal scanlines overlay */
+.api-scanlines {
   background: repeating-linear-gradient(
     to bottom,
     rgba(255, 255, 255, 0.02),
@@ -290,10 +263,27 @@
   );
   pointer-events: none;
   mix-blend-mode: overlay;
-  opacity: 0;
-  transform: translateX(-10px);
 }
 
+/* API row enter animation */
+.api-row {
+  opacity: 0;
+  transform: translateX(-8px);
+  animation: api-row-enter 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes api-row-enter {
+  0% {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Method highlight on hover */
 .api-method {
   transition:
     color 200ms ease,
@@ -302,7 +292,42 @@
 
 tr:hover .api-method {
   color: #e2711d; /* signal-dark */
-  text-shadow: 0 0 8px rgba(226, 113, 29, 0.35);
+  text-shadow: 0 0 10px rgba(226, 113, 29, 0.35);
+}
+
+/* Blinking cursor in the prompt line */
+.terminal-cursor {
+  display: inline-block;
+  width: 0.35ch;
+  height: 1.2em;
+  background: rgb(255, 255, 255);
+  animation: terminal-blink 1.1s steps(1, start) infinite;
+}
+
+@keyframes terminal-blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .api-row {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .terminal-cursor {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 /* =========================================================

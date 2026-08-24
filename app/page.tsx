@@ -6,6 +6,7 @@ import { SecurityIcon } from "@/components/Securityicon";
 import { Reveal } from "@/components/Reveal";
 import { DeliveryField } from "@/components/DeliveryField";
 import { QueueBurst } from "@/components/QueueBurst";
+import { TerminalApi } from "@/components/Api";
 import {
   getSiteConfig,
   getFaqs,
@@ -265,32 +266,7 @@ export default async function HomePage() {
                   {page.engineering.cta_label}
                 </a>
               </div>
-              <div className="card overflow-x-auto bg-ink !p-0">
-                <div className="absolute inset-0 api-row" />
-                <div className="border-b border-paper/10 px-5 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-paper/50">
-                  REST API — endpoint surface
-                </div>
-                <table className="w-full font-mono text-[12.5px]">
-                  <tbody>
-                    {page.engineering.api_endpoints.map((e) => (
-                      <tr
-                        key={e.path}
-                        className="border-b border-paper/5 last:border-0"
-                      >
-                        <td className="whitespace-nowrap px-5 py-2.5 text-wire api-method">
-                          {e.method}
-                        </td>
-                        <td className="whitespace-nowrap px-2 py-2.5 text-paper">
-                          {e.path}
-                        </td>
-                        <td className="hidden px-5 py-2.5 text-paper/50 sm:table-cell">
-                          {e.desc}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <TerminalApi endpoints={page.engineering.api_endpoints} />
             </div>
           </section>
         </Reveal>
