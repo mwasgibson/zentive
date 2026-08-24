@@ -5,7 +5,7 @@ const CMS_API_URL = process.env.CMS_API_URL ?? "http://localhost:8000";
 // How long a cached response is served before Next.js revalidates it in the
 // background (ISR). 60s means a CMS edit shows up on the live site within a
 // minute, without a redeploy. Tune per how "live" this needs to feel.
-const REVALIDATE_SECONDS = 60;
+const REVALIDATE_SECONDS = 20;
 
 async function cmsFetch<T>(path: string): Promise<T | null> {
   try {
@@ -13,7 +13,9 @@ async function cmsFetch<T>(path: string): Promise<T | null> {
       next: { revalidate: REVALIDATE_SECONDS },
     });
     if (!res.ok) {
-      console.error(`[cms] ${CMS_API_URL}${path} returned ${res.status}, falling back`);
+      console.error(
+        `[cms] ${CMS_API_URL}${path} returned ${res.status}, falling back`,
+      );
       return null;
     }
     return (await res.json()) as T;
@@ -22,7 +24,10 @@ async function cmsFetch<T>(path: string): Promise<T | null> {
     // Logged rather than swallowed silently: a misconfigured CMS_API_URL or
     // a CMS that isn't running looks identical to a real outage from here,
     // and both were previously indistinguishable from "the CMS has no data."
-    console.error(`[cms] fetch failed for ${CMS_API_URL}${path}, falling back:`, err);
+    console.error(
+      `[cms] fetch failed for ${CMS_API_URL}${path}, falling back:`,
+      err,
+    );
     return null;
   }
 }
@@ -600,7 +605,8 @@ export async function getPageContent(): Promise<PageContent> {
   const result = {} as PageContent;
   for (const key of keys) {
     const value = cms?.[key];
-    const useValue = value && typeof value === "object" && !isDeeplyEmpty(value);
+    const useValue =
+      value && typeof value === "object" && !isDeeplyEmpty(value);
     (result as unknown as Record<string, unknown>)[key] = useValue
       ? value
       : pageContentFallback[key];

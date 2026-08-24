@@ -7,11 +7,16 @@ export function RouteDiagram() {
       className="w-full"
     >
       <title id="route-diagram-title">
-        Comparison: a direct SMPP connection versus routing through aggregator hops
+        Comparison: a direct SMPP connection versus routing through aggregator
+        hops
       </title>
 
       {/* Row 1: the old way */}
-      <text x="0" y="24" className="fill-muted font-mono text-[11px] uppercase tracking-[0.14em]">
+      <text
+        x="0"
+        y="24"
+        className="fill-muted font-mono text-[11px] uppercase tracking-[0.14em]"
+      >
         Aggregator / CPaaS route
       </text>
       <g className="stroke-border" strokeWidth="2">
@@ -27,7 +32,11 @@ export function RouteDiagram() {
       <Node x={500} y={56} label="Handset" />
 
       {/* Row 2: the direct way */}
-      <text x="0" y="150" className="fill-wire font-mono text-[11px] uppercase tracking-[0.14em]">
+      <text
+        x="0"
+        y="150"
+        className="fill-wire font-mono text-[11px] uppercase tracking-[0.14em]"
+      >
         Direct SMPP route (this platform)
       </text>
       <g className="stroke-wire" strokeWidth="2.5">
@@ -45,8 +54,8 @@ export function RouteDiagram() {
       <Node x={480} y={182} label="Handset" accent />
 
       <text x="0" y="238" className="fill-muted font-body text-[13px]">
-        One persistent SMPP bind. No resale hop, no resale margin, one place to debug a delivery
-        failure.
+        One persistent SMPP bind. No resale hop, no resale margin, one place to
+        debug a delivery failure.
       </text>
     </svg>
   );

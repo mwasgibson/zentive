@@ -6,17 +6,24 @@
   html {
     scroll-behavior: smooth;
   }
+
   body {
     @apply bg-paper text-text font-body antialiased;
   }
-  h1, h2, h3, h4 {
+
+  h1,
+  h2,
+  h3,
+  h4 {
     @apply font-display;
   }
+
   ::selection {
     @apply bg-signal/20 text-ink;
   }
+
   :focus-visible {
-    outline: 2px solid #E2711D;
+    outline: 2px solid #e2711d;
     outline-offset: 2px;
   }
 }
@@ -25,18 +32,23 @@
   .eyebrow {
     @apply font-mono text-xs uppercase tracking-[0.16em] text-wire;
   }
+
   .section {
     @apply mx-auto max-w-content px-6 sm:px-8;
   }
+
   .card {
     @apply rounded-xl border border-border bg-surface p-6;
   }
+
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper transition duration-fast hover:bg-signal-dark active:scale-[0.98];
   }
+
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink/20 px-6 py-3 text-sm font-semibold text-ink transition duration-fast hover:border-ink active:scale-[0.98];
   }
+
   .logo {
     @apply font-display text-2xl font-bold tracking-tight text-ink
       transition-colors duration-200
@@ -45,35 +57,414 @@
   }
 }
 
+/* =========================================================
+   HERO SIGNAL
+   ========================================================= */
+
+.hero-signal {
+  isolation: isolate;
+  background:
+    radial-gradient(
+      circle at 85% 10%,
+      rgba(226, 113, 29, 0.08),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 15% 80%,
+      rgba(20, 112, 111, 0.06),
+      transparent 35%
+    ),
+    #f8f6f1;
+}
+
+.hero-signal-grid {
+  background-image:
+    linear-gradient(to right, rgba(20, 20, 20, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 20, 20, 0.045) 1px, transparent 1px);
+
+  background-size: 28px 28px;
+
+  mask-image: linear-gradient(to bottom, black, transparent 90%);
+}
+
+.hero-signal-glow {
+  background: rgba(226, 113, 29, 0.1);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.hero-message-animation {
+  animation: hero-message-enter 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-route-line {
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(226, 113, 29, 0.25) 15%,
+    rgba(226, 113, 29, 0.8) 50%,
+    rgba(226, 113, 29, 0.25) 85%,
+    transparent 100%
+  );
+
+  transform-origin: left;
+  animation: route-line-flow 2.4s ease-in-out infinite;
+}
+
+.delivery-status {
+  position: absolute;
+  display: inline-block;
+  white-space: nowrap;
+  font-family: theme("fontFamily.mono");
+  font-size: 0.625rem;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: delivery-status-cycle 4.4s cubic-bezier(0.22, 1, 0.36, 1)
+    var(--delivery-delay) infinite;
+}
+
+/*
+ * Cycle length: 4.4s (2 × 2.2s interval)
+ * - 0–15%: fade in
+ * - 15–55%: fully visible (lingers)
+ * - 55–70%: fade out
+ * - 70–100%: hidden
+ */
+@keyframes delivery-status-cycle {
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+    filter: blur(3px);
+  }
+
+  15% {
+    opacity: 0.42;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+
+  55% {
+    opacity: 0.42;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+
+  70% {
+    opacity: 0;
+    transform: translateY(-5px);
+    filter: blur(3px);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-5px);
+    filter: blur(3px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  .delivery-status {
+    animation: none;
+    opacity: 0.42;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* =========================================================
+   SECTION MOTION
+   ========================================================= */
+
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.reveal-stagger.is-visible > * {
+  animation: stagger-up 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.reveal-stagger.is-visible > *:nth-child(1) {
+  animation-delay: 80ms;
+}
+
+.reveal-stagger.is-visible > *:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.reveal-stagger.is-visible > *:nth-child(3) {
+  animation-delay: 220ms;
+}
+
+.reveal-stagger.is-visible > *:nth-child(4) {
+  animation-delay: 290ms;
+}
+
+.reveal-stagger.is-visible > *:nth-child(5) {
+  animation-delay: 360ms;
+}
+
+.reveal-stagger.is-visible > *:nth-child(6) {
+  animation-delay: 430ms;
+}
+
+.security-icon {
+  animation: security-icon-float 3.5s ease-in-out infinite;
+}
+
+.security-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 80%);
+}
+
+@keyframes security-icon-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+/* =========================================================
+   CARD HOVER
+   ========================================================= */
+
+.card-motion {
+  transition:
+    transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 300ms ease;
+}
+
+.card-motion:hover {
+  transform: translateY(-5px);
+  border-color: rgba(20, 20, 20, 0.18);
+}
+
+/* =========================================================
+   API / TERMINAL MOTION
+   ========================================================= */
+
+.api-row.is-visible {
+  animation: api-row-enter 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.api-row:nth-child(1) {
+  animation-delay: 80ms;
+}
+
+.api-row:nth-child(2) {
+  animation-delay: 140ms;
+}
+
+.api-row:nth-child(3) {
+  animation-delay: 200ms;
+}
+
+.api-row:nth-child(4) {
+  animation-delay: 260ms;
+}
+
+.api-row:nth-child(5) {
+  animation-delay: 320ms;
+}
+
+.api-row:nth-child(6) {
+  animation-delay: 380ms;
+}
+
+.api-row {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.02) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.api-method {
+  transition:
+    color 200ms ease,
+    text-shadow 200ms ease;
+}
+
+tr:hover .api-method {
+  color: #e2711d; /* signal-dark */
+  text-shadow: 0 0 8px rgba(226, 113, 29, 0.35);
+}
+
+/* =========================================================
+   KEYFRAMES
+   ========================================================= */
+
+@keyframes hero-message-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(5px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes route-line-flow {
+  0% {
+    opacity: 0.25;
+    transform: scaleX(0.3);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  100% {
+    opacity: 0.25;
+    transform: scaleX(0.3);
+  }
+}
+
+@keyframes stagger-up {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes api-row-enter {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
 /*
- * Route-pulse: a dot traveling the hero diagram's "direct" line. This is the
- * one place motion is used to reinforce the page's actual argument (one
- * continuous connection, not several hops) rather than just decorate —
- * already covered by the prefers-reduced-motion override above, which zeroes
- * out every animation-duration on the page including this one.
+ * Kept from the original design language.
+ * Useful if RouteDiagram is still used elsewhere.
  */
 @keyframes route-pulse {
   0% {
     transform: translateX(0);
     opacity: 0;
   }
+
   8% {
     opacity: 1;
   }
+
   92% {
     opacity: 1;
   }
+
   100% {
     transform: translateX(480px);
     opacity: 0;
   }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .hero-message-animation,
+  .hero-route-line {
+    animation: none !important;
+  }
+}
+
+.how-step {
+  opacity: 0;
+  animation: stagger-up 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.how-arrow {
+  opacity: 0;
+  animation: arrow-enter 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 450ms;
+}
+
+@keyframes arrow-enter {
+  0% {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .how-step,
+  .how-arrow,
+  .api-row {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+.btn-primary {
+  position: relative;
+  isolation: isolate;
+}
+
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(226, 113, 29, 0.25),
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 300ms ease;
+  z-index: -1;
+}
+
+.btn-primary:hover::before {
+  opacity: 1;
 }
