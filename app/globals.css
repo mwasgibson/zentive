@@ -413,6 +413,79 @@ tr:hover .api-method {
   }
 }
 
+/*
+ * Aggregator-route dot: same idea as route-pulse, but it stalls at every
+ * intermediate hop (Aggregator, Upstream reseller, SMSC) instead of
+ * gliding straight through, and takes twice as long per lap. The pauses
+ * and the slower cycle are the point — this is what "more hops" looks
+ * like next to the direct route's one uninterrupted pass.
+ */
+/*
+ * Thin fill bar along the bottom of the active platform tab, showing
+ * how long until it auto-advances. animation-play-state is toggled
+ * from React (paused on hover/focus, on a hidden tab, or once the
+ * person clicks a tab themselves) — the keyframe itself just fills
+ * left to right over the duration React sets inline.
+ */
+.tab-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  transform-origin: left;
+  transform: scaleX(0);
+  background: theme("colors.signal.dark");
+  animation-name: tab-progress-fill;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes tab-progress-fill {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes route-pulse-aggregator {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+
+  3% {
+    opacity: 1;
+  }
+
+  20%,
+  32% {
+    transform: translateX(104px);
+  }
+
+  50%,
+  62% {
+    transform: translateX(244px);
+  }
+
+  80%,
+  90% {
+    transform: translateX(384px);
+  }
+
+  97% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(500px);
+    opacity: 0;
+  }
+}
+
 /* =========================================================
    REDUCED MOTION
    ========================================================= */

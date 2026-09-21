@@ -1,4 +1,5 @@
 import { RouteDiagram } from "@/components/RouteDiagram";
+import { PlatformTabs } from "@/components/PlatformTabs";
 import { FaqItem } from "@/components/FaqItem";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -46,8 +47,7 @@ export default async function HomePage() {
           <DeliveryField />
           <div className="grid items-center gap-14 lg:grid-cols-[1fr_1.15fr]">
             <div>
-              <p className="eyebrow">{page.hero.eyebrow}</p>
-              <h1 className="mt-4 text-4xl font-semibold leading-[1.08] tracking-tight text-ink sm:text-5xl">
+              <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight text-ink sm:text-5xl">
                 {page.hero.headline_before}
                 <br />
                 <span className="text-signal-dark">
@@ -91,35 +91,10 @@ export default async function HomePage() {
             className="border-t border-border bg-surface py-20"
           >
             <div className="section">
-              <p className="eyebrow">The platform</p>
-              <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+              <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                 {page.features.heading}
               </h2>
-              <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {page.features.groups.map((group) => (
-                  <div key={group.category} className="card card-motion">
-                    <h3 className="font-display text-base font-semibold text-ink">
-                      {group.category}
-                    </h3>
-                    <ul className="mt-4 space-y-2.5">
-                      {group.items.map((item) => (
-                        <li
-                          key={item}
-                          className="flex gap-2.5 text-sm text-muted"
-                        >
-                          <span
-                            aria-hidden
-                            className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-wire transition-transform group-hover:scale-125 group-hover:bg-signal"
-                          />
-                          <span className="transition-colors group-hover:text-ink">
-                            {item}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
+              <PlatformTabs groups={page.features.groups} />
             </div>
           </section>
         </Reveal>
@@ -132,8 +107,7 @@ export default async function HomePage() {
           >
             <div className="absolute inset-0 security-grid" />
             <div className="section">
-              <p className="eyebrow text-paper/50">Security &amp; compliance</p>
-              <h2 className="mt-3 max-w-2xl text-2xl font-semibold tracking-tight text-paper sm:text-3xl">
+              <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-paper sm:text-3xl">
                 {page.security.heading}
               </h2>
               <div className="mt-10 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -187,8 +161,7 @@ export default async function HomePage() {
         <Reveal variant="up">
           <section id="how-it-works" className="py-20">
             <div className="section">
-              <p className="eyebrow">How it works</p>
-              <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+              <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                 {page.how_it_works.heading}
               </h2>
               <p className="mt-4 max-w-2xl text-muted">
@@ -244,8 +217,7 @@ export default async function HomePage() {
           <section className="border-t border-border bg-surface py-20">
             <div className="section grid gap-12 lg:grid-cols-2 lg:items-center">
               <div>
-                <p className="eyebrow">For engineering teams</p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+                <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                   {page.engineering.heading}
                 </h2>
                 <ul className="mt-6 space-y-3">
@@ -301,15 +273,14 @@ export default async function HomePage() {
           >
             <div className="absolute inset-0 security-grid" />
             <div className="section">
-              <p className="eyebrow text-paper/50">Who it's for</p>
-              <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-paper sm:text-4xl">
+              <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-paper sm:text-4xl">
                 {page.use_cases.heading}
               </h2>
-              <div className="mt-12 grid gap-6 md:grid-cols-2">
+              <div className="mt-12 grid gap-10 md:grid-cols-2 md:divide-x md:divide-paper/15">
                 {page.use_cases.segments.map((seg) => (
                   <div
                     key={seg.segment}
-                    className="rounded-xl border border-paper/15 p-7"
+                    className="md:px-10 md:first:pl-0 md:last:pr-0"
                   >
                     <h3 className="font-display text-xl font-semibold text-paper">
                       {seg.segment}
@@ -345,8 +316,7 @@ export default async function HomePage() {
           <Reveal variant="scale">
             <section id="testimonials" className="py-20">
               <div className="section">
-                <p className="eyebrow">What clients say</p>
-                <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+                <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                   From pilot clients already sending through{" "}
                   {siteConfig.productName}.
                 </h2>
@@ -392,8 +362,7 @@ export default async function HomePage() {
           <section id="faq" className="py-20">
             <div className="section grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
               <div>
-                <p className="eyebrow">FAQ</p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+                <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                   Straight answers, before you talk to us.
                 </h2>
                 <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">

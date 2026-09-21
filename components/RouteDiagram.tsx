@@ -25,6 +25,12 @@ export function RouteDiagram() {
         <line x1="258" y1="56" x2="370" y2="56" strokeDasharray="4 4" />
         <line x1="398" y1="56" x2="500" y2="56" strokeDasharray="4 4" />
       </g>
+      <circle
+        cy="56"
+        r="4"
+        className="fill-muted"
+        style={{ animation: "route-pulse-aggregator 7s ease-in-out infinite" }}
+      />
       <Node x={0} y={56} label="You" />
       <Node x={104} y={56} label="Aggregator" sub="+ margin" muted />
       <Node x={244} y={56} label="Upstream" sub="reseller" muted />
@@ -47,7 +53,7 @@ export function RouteDiagram() {
         cy="182"
         r="4"
         className="fill-signal-dark"
-        style={{ animation: "route-pulse 3.5s ease-in-out infinite" }}
+        style={{ animation: "route-pulse 6.55s ease-in-out infinite" }}
       />
       <Node x={0} y={182} label="You" accent />
       <Node x={244} y={182} label="SMSC" sub="Safaricom" accent />

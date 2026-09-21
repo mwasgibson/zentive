@@ -5,14 +5,14 @@ import { useEffect, useState } from "react";
 const STATUSES = ["Queued", "Sending", "Sent", "Delivered", "Failed"] as const;
 
 const STATUS_FIELDS = [
-  { x: "6%", y: "18%", delay: 0, color: "wire" },
-  { x: "88%", y: "12%", delay: 1400, color: "signal-dark" },
-  { x: "94%", y: "58%", delay: 2800, color: "wire" },
-  { x: "12%", y: "78%", delay: 700, color: "signal-dark" },
-  { x: "72%", y: "84%", delay: 2100, color: "wire" },
-  { x: "38%", y: "8%", delay: 3500, color: "signal-dark" },
-  { x: "58%", y: "94%", delay: 300, color: "wire" },
-  { x: "22%", y: "42%", delay: 2500, color: "signal-dark" },
+  { x: "6%", y: "18%", delay: 0, color: "wire", phase: 0 },
+  { x: "88%", y: "12%", delay: 1400, color: "signal-dark", phase: 3 },
+  { x: "94%", y: "58%", delay: 2800, color: "wire", phase: 1 },
+  { x: "12%", y: "78%", delay: 700, color: "signal-dark", phase: 4 },
+  { x: "72%", y: "84%", delay: 2100, color: "wire", phase: 2 },
+  { x: "38%", y: "8%", delay: 3500, color: "signal-dark", phase: 0 },
+  { x: "58%", y: "94%", delay: 300, color: "wire", phase: 3 },
+  { x: "22%", y: "42%", delay: 2500, color: "signal-dark", phase: 1 },
 ] as const;
 
 const COLOR_CLASS = {
@@ -48,7 +48,7 @@ export function DeliveryField() {
             } as React.CSSProperties
           }
         >
-          {STATUSES[statusIndex]}
+          {STATUSES[(statusIndex + field.phase) % STATUSES.length]}
         </span>
       ))}
     </div>
