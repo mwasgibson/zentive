@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const STATUSES = ["Queued", "Sending", "Sent", "Delivered", "Failed"] as const;
 
@@ -17,50 +17,96 @@ type Particle = {
   color: keyof typeof COLOR_CLASS;
 };
 
-function randomParticle(id: number): Particle {
+function randomMeta(id: number, x: number, y: number): Particle {
   return {
     id,
-    // Keep off the very edges so labels aren’t clipped
-    x: 4 + Math.random() * 90,
-    y: 6 + Math.random() * 86,
+    x,
+    y,
     label: STATUSES[Math.floor(Math.random() * STATUSES.length)],
     color: Math.random() > 0.5 ? "wire" : "signal-dark",
   };
 }
 
+function randomPosition(): { x: number; y: number } {
+  return {
+    x: 4 + Math.random() * 90,
+    y: 6 + Math.random() * 86,
+  };
+}
+
 /** Lifetime of one label — must match CSS animation duration */
 const LIFE_MS = 4200;
-/** How often a new label appears */
+/** How often a new label appears on its own */
 const SPAWN_MS = 850;
+
+/** Elements that should NOT trigger a spawn when tapped */
+const INTERACTIVE =
+  'a, button, input, textarea, select, summary, [role="button"], [data-no-spawn]';
 
 export function DeliveryField() {
   const [items, setItems] = useState<Particle[]>([]);
   const nextId = useRef(0);
+  const rootRef = useRef<HTMLDivElement>(null);
 
+  const spawnAt = useCallback((x: number, y: number) => {
+    const id = ++nextId.current;
+    // Clamp so labels stay inside the field
+    const cx = Math.min(96, Math.max(2, x));
+    const cy = Math.min(96, Math.max(2, y));
+    setItems((prev) => [...prev, randomMeta(id, cx, cy)].slice(-14));
+    window.setTimeout(() => {
+      setItems((prev) => prev.filter((p) => p.id !== id));
+    }, LIFE_MS);
+  }, []);
+
+  // Auto-spawn at random positions (never stops)
   useEffect(() => {
     const spawn = () => {
-      const id = ++nextId.current;
-      setItems((prev) => [...prev, randomParticle(id)].slice(-10));
-      window.setTimeout(() => {
-        setItems((prev) => prev.filter((p) => p.id !== id));
-      }, LIFE_MS);
+      const { x, y } = randomPosition();
+      spawnAt(x, y);
     };
 
-    // A few on first paint so the field isn’t empty
     spawn();
     const t1 = window.setTimeout(spawn, 200);
     const t2 = window.setTimeout(spawn, 450);
-
     const interval = window.setInterval(spawn, SPAWN_MS);
+
     return () => {
       window.clearInterval(interval);
       window.clearTimeout(t1);
       window.clearTimeout(t2);
     };
-  }, []);
+  }, [spawnAt]);
+
+  // Tap / click empty space in the hero → spawn at that point
+  useEffect(() => {
+    const field = rootRef.current;
+    const section = field?.parentElement;
+    if (!section) return;
+
+    const onPointerDown = (e: PointerEvent) => {
+      // Ignore real UI controls
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      if (target.closest(INTERACTIVE)) return;
+      // Ignore the route diagram card
+      if (target.closest(".card")) return;
+
+      const rect = section.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      spawnAt(x, y);
+    };
+
+    section.addEventListener("pointerdown", onPointerDown);
+    return () => section.removeEventListener("pointerdown", onPointerDown);
+  }, [spawnAt]);
 
   return (
     <div
+      ref={rootRef}
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none"
     >
