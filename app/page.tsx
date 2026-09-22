@@ -165,14 +165,18 @@ export default async function HomePage() {
           </MouseSpotlight>
         </Reveal>
 
-        {/* GLOSSARY */}
+        {/* GLOSSARY — paper-toned cards on surface so they don’t wash out */}
         <Reveal variant="right">
           <section className="border-t border-border bg-surface py-16">
             <div className="section">
               <p className="eyebrow">In plain terms</p>
               <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {page.glossary.items.map((item) => (
-                  <TiltCard key={item.title} maxTilt={8} className="card">
+                  <TiltCard
+                    key={item.title}
+                    maxTilt={8}
+                    className="glossary-card rounded-xl border border-border p-6"
+                  >
                     <h3 className="font-display text-lg font-semibold text-ink">
                       {item.title}
                     </h3>
@@ -400,7 +404,7 @@ export default async function HomePage() {
                   Straight answers, before you talk to us.
                 </h2>
                 <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
-                  Don&apos;t see your question here? Reach us directly at{" "}
+                  Don't see your question here? Reach us directly at{" "}
                   <a
                     href={`mailto:${siteConfig.contactEmail}`}
                     className="text-ink underline"
