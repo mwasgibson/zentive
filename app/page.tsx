@@ -47,7 +47,7 @@ export default async function HomePage() {
       />
       <SiteHeader productName={siteConfig.productName} />
       <main id="top">
-        {/* HERO — no overflow-hidden so buttons can float over text */}
+        {/* HERO */}
         <section className="section relative pb-20 pt-16 sm:pt-24">
           <DeliveryField />
           <div className="grid items-center gap-10 lg:grid-cols-[0.9fr_1.35fr] lg:gap-12">
@@ -236,11 +236,11 @@ export default async function HomePage() {
           </section>
         </Reveal>
 
-        {/* ENGINEERING */}
+        {/* ENGINEERING — CTA stays in left column, away from terminal */}
         <Reveal variant="left">
           <section className="border-t border-border bg-surface py-20">
             <div className="section grid gap-12 lg:grid-cols-2 lg:items-center">
-              <div>
+              <div className="relative">
                 <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                   {page.engineering.heading}
                 </h2>
@@ -255,7 +255,7 @@ export default async function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <Magnetic className="mt-8">
+                <Magnetic className="mt-8" bounds="parent">
                   <a
                     href={`mailto:${siteConfig.contactEmail}`}
                     className="btn-secondary"
@@ -412,7 +412,7 @@ export default async function HomePage() {
           </section>
         </Reveal>
 
-        {/* FINAL CTA */}
+        {/* FINAL CTA — stays inside this section, cannot enter footer */}
         <Reveal>
           <section className="border-t border-border bg-surface py-20">
             <div className="section flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
@@ -424,7 +424,7 @@ export default async function HomePage() {
                   {page.final_cta.body}
                 </p>
               </div>
-              <Magnetic>
+              <Magnetic bounds="section">
                 <a
                   href={`mailto:${siteConfig.contactEmail}`}
                   className="btn-primary group shrink-0"
