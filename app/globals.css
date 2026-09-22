@@ -78,7 +78,7 @@
 }
 
 /* =========================================================
-   HERO — delivery status field
+   HERO — delivery status field (random spawn positions)
    ========================================================= */
 
 .hero-signal {
@@ -97,22 +97,9 @@
     #f8f6f1;
 }
 
-/* Slot anchors a stack of status words at a fixed position */
-.delivery-status-slot {
-  position: absolute;
-  pointer-events: none;
-  user-select: none;
-}
-
-/*
- * 10s cycle, 5 statuses → each word is “on” for ~2s of the loop.
- * No blur. Stronger opacity for presence.
- * Pure CSS — no JS updates, so taps never restart or spawn labels.
- */
+/* One-shot fade — each particle is born at a random spot via React */
 .delivery-status {
   position: absolute;
-  left: 0;
-  top: 0;
   display: block;
   white-space: nowrap;
   font-family: theme("fontFamily.mono");
@@ -124,32 +111,29 @@
   opacity: 0;
   pointer-events: none;
   user-select: none;
-  animation: delivery-status-cycle 10s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation: delivery-status-cycle 4.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes delivery-status-cycle {
-  /* fade in */
   0% {
     opacity: 0;
-    transform: translateY(5px);
+    transform: translateY(6px);
   }
-  3% {
+  12% {
     opacity: 0.8;
     transform: translateY(0);
   }
-  /* hold (~2s of 10s = 20%) */
-  17% {
+  55% {
     opacity: 0.8;
     transform: translateY(0);
   }
-  /* fade out */
-  20% {
+  78% {
     opacity: 0;
-    transform: translateY(-5px);
+    transform: translateY(-6px);
   }
   100% {
     opacity: 0;
-    transform: translateY(-5px);
+    transform: translateY(-6px);
   }
 }
 
@@ -420,10 +404,6 @@ tr:hover .api-method {
 
   .delivery-status {
     animation: none !important;
-    opacity: 0 !important;
-  }
-
-  .delivery-status-slot .delivery-status:first-child {
     opacity: 0.65 !important;
     transform: none !important;
   }
