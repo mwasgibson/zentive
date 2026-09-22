@@ -165,7 +165,7 @@ export default async function HomePage() {
           </MouseSpotlight>
         </Reveal>
 
-        {/* GLOSSARY — paper-toned cards on surface so they don’t wash out */}
+        {/* GLOSSARY */}
         <Reveal variant="right">
           <section className="border-t border-border bg-surface py-16">
             <div className="section">
