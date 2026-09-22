@@ -16,10 +16,12 @@ export function MouseSpotlight({
   children,
   className = "",
   id,
+  as: Component = "section",
 }: {
   children: ReactNode;
   className?: string;
   id?: string;
+  as?: React.ElementType;
 }) {
   const ref = useRef<HTMLElement>(null);
 
@@ -34,8 +36,8 @@ export function MouseSpotlight({
   }, []);
 
   return (
-    <section
-      ref={ref as React.RefObject<HTMLElement>}
+    <Component
+      ref={ref as React.RefObject<any>}
       id={id}
       className={`mouse-spotlight ${className}`}
       onMouseMove={onMove}
@@ -47,6 +49,6 @@ export function MouseSpotlight({
       }
     >
       {children}
-    </section>
+    </Component>
   );
 }

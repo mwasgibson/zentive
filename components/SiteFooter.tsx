@@ -1,10 +1,14 @@
 import { getSiteConfig } from "@/lib/cms";
+import { MouseSpotlight } from "@/components/MouseSpotlight";
 
 export async function SiteFooter() {
   const siteConfig = await getSiteConfig();
 
   return (
-    <footer className="border-t border-border bg-ink text-paper/80">
+    <MouseSpotlight
+      as="footer"
+      className="border-t border-border bg-ink text-paper/80"
+    >
       <div className="section grid gap-10 py-14 md:grid-cols-3">
         <div>
           <a
@@ -57,6 +61,6 @@ export async function SiteFooter() {
         </p>
         <p>Nairobi, Kenya</p>
       </div>
-    </footer>
+    </MouseSpotlight>
   );
 }

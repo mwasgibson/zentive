@@ -675,7 +675,7 @@
   z-index: 0;
   background: radial-gradient(
     600px circle at var(--spot-x, 50%) var(--spot-y, 40%),
-    rgba(226, 113, 29, 0.12),
+    rgba(226, 113, 29, 0.15),
     transparent 55%
   );
 }
