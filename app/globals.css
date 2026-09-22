@@ -460,7 +460,6 @@
   }
 }
 
-/* Glossary — warm fill + soft 3D depth (TiltCard handles mouse tilt) */
 .glossary-card {
   background: linear-gradient(160deg, #f3f0ea 0%, #cac9c7 100%);
   transform-style: preserve-3d;
@@ -557,6 +556,108 @@
 
 .security-copy:hover .security-body {
   color: rgba(243, 245, 241, 0.95);
+}
+
+/* =========================================================
+   HOW IT WORKS — path + auto-walk + number pulse
+   ========================================================= */
+
+.how-flow {
+  position: relative;
+}
+
+/* Horizontal wire — desktop only */
+.how-path {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .how-path {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0.7rem;
+    height: 1px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .how-path::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: theme("colors.border");
+    opacity: 0.7;
+  }
+
+  .how-path-track {
+    position: absolute;
+    inset: 0;
+    background: theme("colors.signal.dark");
+    transform-origin: left center;
+    transform: scaleX(0);
+    transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+.how-step {
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  animation: stagger-up 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transition: opacity 280ms ease;
+}
+
+.how-step.is-active {
+  opacity: 1;
+}
+
+.how-step-n {
+  display: inline-block;
+  position: relative;
+  transition: color 200ms ease;
+}
+
+.how-step-n.is-active {
+  animation: how-n-pulse 520ms cubic-bezier(0.34, 1.5, 0.64, 1);
+}
+
+@keyframes how-n-pulse {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.28);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.how-arrow {
+  opacity: 0;
+  animation: arrow-enter 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 450ms;
+  transition:
+    color 200ms ease,
+    transform 280ms ease;
+}
+
+.how-arrow.is-active {
+  color: theme("colors.signal.dark");
+  transform: translateX(3px);
+}
+
+@keyframes arrow-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* =========================================================
@@ -817,28 +918,6 @@ tr:hover .api-method {
   }
 }
 
-.how-step {
-  opacity: 0;
-  animation: stagger-up 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.how-arrow {
-  opacity: 0;
-  animation: arrow-enter 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: 450ms;
-}
-
-@keyframes arrow-enter {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 /* =========================================================
    REDUCED MOTION
    ========================================================= */
@@ -890,11 +969,16 @@ tr:hover .api-method {
 
   .how-step,
   .how-arrow,
+  .how-step-n,
   .api-row,
   .faq-answer {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .how-path-track {
+    transform: scaleX(1) !important;
   }
 
   .mouse-spotlight::before {
