@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Proximity } from "@/components/Proximity";
 
 type Step = {
@@ -56,15 +56,6 @@ export function HowItWorks({
     return () => window.clearTimeout(t);
   }, [active, running, steps.length]);
 
-  const pathProgress =
-    steps.length <= 1 ? 1 : active / (steps.length - 1);
-
-  const pathStyle: CSSProperties = reducedMotion
-    ? { transform: "scaleX(1)" }
-    : {
-        transform: `scaleX(${inView ? Math.max(0.08, pathProgress) : 0})`,
-      };
-
   return (
     <div ref={rootRef}>
       <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
@@ -77,13 +68,10 @@ export function HowItWorks({
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        <div className="how-path" aria-hidden>
-          <div className="how-path-track" style={pathStyle} />
-        </div>
-
         <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, i) => {
             const isActive = i === active;
+            const hasNext = i < steps.length - 1;
             return (
               <Proximity
                 key={step.n}
@@ -119,15 +107,26 @@ export function HowItWorks({
                 <p className="mt-2 text-sm leading-relaxed text-muted">
                   {step.body}
                 </p>
-                {i < steps.length - 1 && (
+                {hasNext && (
                   <span
                     aria-hidden
                     className={[
-                      "how-arrow absolute right-[-1rem] top-1 hidden font-mono text-border lg:block",
+                      "how-handoff absolute right-[-1.1rem] top-0.5 hidden lg:flex",
                       isActive ? "is-active" : "",
                     ].join(" ")}
                   >
-                    →
+                    {/* Packet hops toward the next step while this one is active */}
+                    {isActive && !reducedMotion && (
+                      <span key={active} className="how-packet" />
+                    )}
+                    <span
+                      className={[
+                        "how-arrow font-mono text-border",
+                        isActive ? "is-active" : "",
+                      ].join(" ")}
+                    >
+                      →
+                    </span>
                   </span>
                 )}
               </Proximity>
