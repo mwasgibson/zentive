@@ -34,7 +34,7 @@
   }
 
   .section {
-    @apply mx-auto max-w-content px-6 sm:px-8;
+    @apply mx-auto w-full px-6 sm:px-8;
   }
 
   .card {
@@ -675,7 +675,7 @@
   z-index: 0;
   background: radial-gradient(
     600px circle at var(--spot-x, 50%) var(--spot-y, 40%),
-    rgba(226, 113, 29, 0.15),
+    rgba(226, 113, 29, 0.18),
     transparent 55%
   );
 }

@@ -117,7 +117,7 @@ export function PlatformTabs({ groups }: { groups: FeatureGroup[] }) {
   }
 
   return (
-    <div className="mt-12 grid gap-8 lg:grid-cols-[280px_1fr]">
+    <div className="mt-12 grid gap-8 lg:grid-cols-[280px_1fr] max-w-5xl">
       <div
         role="tablist"
         aria-label="Platform feature categories"
@@ -184,7 +184,7 @@ export function PlatformTabs({ groups }: { groups: FeatureGroup[] }) {
         })}
       </div>
 
-      <TiltCard maxTilt={5} className="feature-panel-3d">
+      <TiltCard maxTilt={5} className="feature-panel-3d h-fit">
         <div
           key={activeIndex}
           id={`${baseId}-panel-${activeIndex}`}

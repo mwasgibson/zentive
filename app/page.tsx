@@ -383,7 +383,7 @@ export default async function HomePage() {
         {/* FINAL CTA */}
         <Reveal>
           <section className="border-t border-border bg-surface py-20">
-            <div className="section flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
+            <div className="section flex flex-col items-start gap-8 lg:flex-row lg:items-center">
               <div>
                 <h2 className="max-w-xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                   {page.final_cta.headline}
