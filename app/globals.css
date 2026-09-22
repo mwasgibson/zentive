@@ -78,7 +78,7 @@
 }
 
 /* =========================================================
-   HERO — delivery status field (random spawn positions)
+   HERO — delivery status chat bubbles
    ========================================================= */
 
 .hero-signal {
@@ -97,43 +97,129 @@
     #f8f6f1;
 }
 
-/* One-shot fade — each particle is born at a random spot via React */
-.delivery-status {
+.delivery-bubble {
   position: absolute;
-  display: block;
-  white-space: nowrap;
-  font-family: theme("fontFamily.mono");
-  font-size: 0.7rem;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  opacity: 0;
+  display: inline-flex;
+  align-items: center;
   pointer-events: none;
   user-select: none;
-  animation: delivery-status-cycle 4.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+  animation: delivery-bubble-cycle 4.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-@keyframes delivery-status-cycle {
+.delivery-bubble-text {
+  font-family: theme("fontFamily.mono");
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0.4rem 0.7rem;
+  border-radius: 1rem;
+  position: relative;
+}
+
+/* Tail via ::after */
+.delivery-bubble-text::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+/* A — solid ink, left tail */
+.bubble-a .delivery-bubble-text {
+  background: #141414;
+  color: #f3f5f1;
+  border-radius: 1rem 1rem 1rem 0.25rem;
+}
+.bubble-a .delivery-bubble-text::after {
+  left: 0;
+  bottom: -5px;
+  border-width: 6px 8px 0 0;
+  border-color: #141414 transparent transparent transparent;
+}
+
+/* B — paper surface, right tail */
+.bubble-b .delivery-bubble-text {
+  background: #fff;
+  color: #141414;
+  border: 1px solid rgba(20, 20, 20, 0.12);
+  border-radius: 1rem 1rem 0.25rem 1rem;
+  box-shadow: 0 1px 3px rgba(20, 20, 20, 0.06);
+}
+.bubble-b .delivery-bubble-text::after {
+  right: 0;
+  bottom: -5px;
+  border-width: 6px 0 0 8px;
+  border-color: #fff transparent transparent transparent;
+  filter: drop-shadow(0 1px 0 rgba(20, 20, 20, 0.08));
+}
+
+/* C — signal tint, left tail */
+.bubble-c .delivery-bubble-text {
+  background: rgba(226, 113, 29, 0.16);
+  color: #c45f12;
+  border: 1px solid rgba(226, 113, 29, 0.28);
+  border-radius: 1rem 1rem 1rem 0.25rem;
+}
+.bubble-c .delivery-bubble-text::after {
+  left: 0;
+  bottom: -5px;
+  border-width: 6px 8px 0 0;
+  border-color: rgba(226, 113, 29, 0.28) transparent transparent transparent;
+}
+
+/* D — wire/teal tint, right tail */
+.bubble-d .delivery-bubble-text {
+  background: rgba(20, 112, 111, 0.14);
+  color: #14706f;
+  border: 1px solid rgba(20, 112, 111, 0.28);
+  border-radius: 1rem 1rem 0.25rem 1rem;
+}
+.bubble-d .delivery-bubble-text::after {
+  right: 0;
+  bottom: -5px;
+  border-width: 6px 0 0 8px;
+  border-color: rgba(20, 112, 111, 0.28) transparent transparent transparent;
+}
+
+/* E — outline pill, top-left tail */
+.bubble-e .delivery-bubble-text {
+  background: transparent;
+  color: #141414;
+  border: 1.5px solid rgba(20, 20, 20, 0.22);
+  border-radius: 0.25rem 1rem 1rem 1rem;
+}
+.bubble-e .delivery-bubble-text::after {
+  left: 0;
+  top: -5px;
+  border-width: 0 0 6px 8px;
+  border-color: transparent transparent rgba(20, 20, 20, 0.22) transparent;
+}
+
+@keyframes delivery-bubble-cycle {
   0% {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px) scale(0.92);
   }
   12% {
-    opacity: 0.8;
-    transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
   55% {
-    opacity: 0.8;
-    transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
   78% {
     opacity: 0;
-    transform: translateY(-6px);
+    transform: translateY(-6px) scale(0.96);
   }
   100% {
     opacity: 0;
-    transform: translateY(-6px);
+    transform: translateY(-6px) scale(0.96);
   }
 }
 
@@ -402,9 +488,9 @@ tr:hover .api-method {
     scroll-behavior: auto !important;
   }
 
-  .delivery-status {
+  .delivery-bubble {
     animation: none !important;
-    opacity: 0.65 !important;
+    opacity: 0.85 !important;
     transform: none !important;
   }
 
