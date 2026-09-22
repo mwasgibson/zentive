@@ -8,6 +8,11 @@ import { Reveal } from "@/components/Reveal";
 import { DeliveryField } from "@/components/DeliveryField";
 import { QueueBurst } from "@/components/QueueBurst";
 import { TerminalApi } from "@/components/Api";
+import { Magnetic } from "@/components/Magnetic";
+import { MouseSpotlight } from "@/components/MouseSpotlight";
+import { TiltCard } from "@/components/TiltCard";
+import { HeroMotion } from "@/components/HeroMotion";
+import { Proximity } from "@/components/Proximity";
 import {
   getSiteConfig,
   getFaqs,
@@ -40,47 +45,61 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
       />
-      <SiteHeader />
+      <SiteHeader productName={siteConfig.productName} />
       <main id="top">
         {/* HERO */}
         <section className="section relative overflow-hidden pb-20 pt-16 sm:pt-24">
           <DeliveryField />
           <div className="grid items-center gap-14 lg:grid-cols-[1fr_1.15fr]">
             <div>
-              <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight text-ink sm:text-5xl">
-                {page.hero.headline_before}
-                <br />
-                <span className="text-signal-dark">
-                  {page.hero.headline_highlight}
-                </span>
-                <br />
-                {page.hero.headline_after}
-              </h1>
-              <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
-                {t(page.hero.subhead)}
-              </p>
-              <div className="mt-8 flex flex-wrap gap-4">
-                <a href="#contact" className="btn-primary">
-                  Request early access
-                </a>
-                <a href="#platform" className="btn-secondary">
-                  {page.hero.secondary_cta_label}
-                </a>
-              </div>
-              <dl className="mt-12 grid grid-cols-3 gap-6 border-t border-border pt-6 text-sm">
-                {page.hero.trust_stats.map((stat) => (
-                  <div key={stat.label}>
-                    <dt className="text-muted">{stat.label}</dt>
-                    <dd className="mt-1 font-mono text-ink">{stat.value}</dd>
-                  </div>
-                ))}
-              </dl>
+              <HeroMotion delay={0}>
+                <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight text-ink sm:text-5xl">
+                  {page.hero.headline_before}
+                  <br />
+                  <span className="text-signal-dark">
+                    {page.hero.headline_highlight}
+                  </span>
+                  <br />
+                  {page.hero.headline_after}
+                </h1>
+              </HeroMotion>
+              <HeroMotion delay={120}>
+                <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
+                  {t(page.hero.subhead)}
+                </p>
+              </HeroMotion>
+              <HeroMotion delay={220}>
+                <div className="mt-8 flex flex-wrap gap-4">
+                  <Magnetic>
+                    <a href="#contact" className="btn-primary">
+                      Request early access
+                    </a>
+                  </Magnetic>
+                  <Magnetic strength={0.18}>
+                    <a href="#platform" className="btn-secondary">
+                      {page.hero.secondary_cta_label}
+                    </a>
+                  </Magnetic>
+                </div>
+              </HeroMotion>
+              <HeroMotion delay={320}>
+                <dl className="mt-12 grid grid-cols-3 gap-6 border-t border-border pt-6 text-sm">
+                  {page.hero.trust_stats.map((stat) => (
+                    <div key={stat.label}>
+                      <dt className="text-muted">{stat.label}</dt>
+                      <dd className="mt-1 font-mono text-ink">{stat.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </HeroMotion>
             </div>
-            <div className="card flex items-center justify-center bg-surface p-4 sm:p-6">
-              <div className="w-full max-w-[110%]">
-                <RouteDiagram />
-              </div>
-            </div>
+            <HeroMotion delay={180}>
+              <TiltCard className="card flex items-center justify-center bg-surface p-4 sm:p-6">
+                <div className="w-full max-w-[110%]">
+                  <RouteDiagram />
+                </div>
+              </TiltCard>
+            </HeroMotion>
           </div>
         </section>
 
@@ -101,7 +120,7 @@ export default async function HomePage() {
 
         {/* SECURITY & COMPLIANCE */}
         <Reveal variant="left">
-          <section
+          <MouseSpotlight
             id="security"
             className="border-t border-border bg-ink py-16 text-paper"
           >
@@ -133,24 +152,24 @@ export default async function HomePage() {
                 ))}
               </div>
             </div>
-          </section>
+          </MouseSpotlight>
         </Reveal>
 
-        {/* GLOSSARY — answer-first blocks for AEO/GEO */}
+        {/* GLOSSARY */}
         <Reveal variant="right">
           <section className="border-t border-border bg-surface py-16">
             <div className="section">
               <p className="eyebrow">In plain terms</p>
               <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
                 {page.glossary.items.map((item) => (
-                  <div key={item.title} className="card-motion">
+                  <Proximity key={item.title}>
                     <h3 className="font-display text-lg font-semibold text-ink">
                       {item.title}
                     </h3>
                     <p className="mt-2 text-sm leading-relaxed text-muted">
                       {t(item.body)}
                     </p>
-                  </div>
+                  </Proximity>
                 ))}
               </div>
             </div>
@@ -169,12 +188,14 @@ export default async function HomePage() {
               </p>
               <div className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
                 {page.how_it_works.steps.map((step, i) => (
-                  <div
+                  <Proximity
                     key={step.n}
                     className="how-step relative"
-                    style={{
-                      animationDelay: `${i * 120}ms`,
-                    }}
+                    style={
+                      {
+                        animationDelay: `${i * 120}ms`,
+                      } as React.CSSProperties
+                    }
                   >
                     <span className="font-mono text-sm text-signal-dark">
                       {step.n}
@@ -205,7 +226,7 @@ export default async function HomePage() {
                         →
                       </span>
                     )}
-                  </div>
+                  </Proximity>
                 ))}
               </div>
             </div>
@@ -231,12 +252,14 @@ export default async function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href={`mailto:${siteConfig.contactEmail}`}
-                  className="btn-secondary mt-8"
-                >
-                  {page.engineering.cta_label}
-                </a>
+                <Magnetic strength={0.2} className="mt-8 inline-block">
+                  <a
+                    href={`mailto:${siteConfig.contactEmail}`}
+                    className="btn-secondary"
+                  >
+                    {page.engineering.cta_label}
+                  </a>
+                </Magnetic>
               </div>
               <TerminalApi endpoints={page.engineering.api_endpoints} />
             </div>
@@ -253,12 +276,12 @@ export default async function HomePage() {
               </div>
               <div className="mt-8 grid grid-cols-2 gap-8 lg:grid-cols-4">
                 {page.stats.items.map((s) => (
-                  <div key={s.label}>
+                  <Proximity key={s.label}>
                     <p className="font-display text-3xl font-semibold text-ink">
                       {s.value}
                     </p>
                     <p className="mt-1 text-sm text-muted">{s.label}</p>
-                  </div>
+                  </Proximity>
                 ))}
               </div>
             </div>
@@ -267,7 +290,7 @@ export default async function HomePage() {
 
         {/* USE CASES */}
         <Reveal variant="up">
-          <section
+          <MouseSpotlight
             id="use-cases"
             className="border-y border-border bg-ink py-20 text-paper"
           >
@@ -292,7 +315,7 @@ export default async function HomePage() {
                       {seg.scenarios.map((s) => (
                         <li
                           key={s}
-                          className="card-motion flex gap-2.5 text-sm text-paper/80"
+                          className="flex gap-2.5 text-sm text-paper/80 transition-opacity duration-200 hover:text-paper"
                         >
                           <span
                             aria-hidden
@@ -302,14 +325,14 @@ export default async function HomePage() {
                         </li>
                       ))}
                     </ul>
-                    <p className="mt-5 border-t border-paper/10 pt-5 text-sm leading-relaxed text-paper/60">
-                      {page.use_cases.closing_line}
-                    </p>
                   </div>
                 ))}
               </div>
+              <p className="mt-10 max-w-2xl text-sm leading-relaxed text-paper/60">
+                {page.use_cases.closing_line}
+              </p>
             </div>
-          </section>
+          </MouseSpotlight>
         </Reveal>
 
         {testimonials.length > 0 && (
@@ -322,34 +345,33 @@ export default async function HomePage() {
                 </h2>
                 <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {testimonials.map((testimonial) => (
-                    <figure
-                      key={testimonial.id}
-                      className="card card-motion flex flex-col justify-between"
-                    >
-                      <blockquote className="text-sm leading-relaxed text-ink">
-                        &ldquo;{testimonial.quote}&rdquo;
-                      </blockquote>
-                      <figcaption className="mt-6 flex items-center gap-3">
-                        {testimonial.logo_url && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={testimonial.logo_url}
-                            alt=""
-                            className="h-9 w-9 rounded-full border border-border object-cover"
-                          />
-                        )}
-                        <div>
-                          <p className="text-sm font-semibold text-ink">
-                            {testimonial.client_name}
-                          </p>
-                          <p className="text-xs text-muted">
-                            {[testimonial.client_role, testimonial.client_org]
-                              .filter(Boolean)
-                              .join(", ")}
-                          </p>
-                        </div>
-                      </figcaption>
-                    </figure>
+                    <Proximity key={testimonial.id}>
+                      <figure className="card flex flex-col justify-between">
+                        <blockquote className="text-sm leading-relaxed text-ink">
+                          &ldquo;{testimonial.quote}&rdquo;
+                        </blockquote>
+                        <figcaption className="mt-6 flex items-center gap-3">
+                          {testimonial.logo_url && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={testimonial.logo_url}
+                              alt=""
+                              className="h-9 w-9 rounded-full border border-border object-cover"
+                            />
+                          )}
+                          <div>
+                            <p className="text-sm font-semibold text-ink">
+                              {testimonial.client_name}
+                            </p>
+                            <p className="text-xs text-muted">
+                              {[testimonial.client_role, testimonial.client_org]
+                                .filter(Boolean)
+                                .join(", ")}
+                            </p>
+                          </div>
+                        </figcaption>
+                      </figure>
+                    </Proximity>
                   ))}
                 </div>
               </div>
@@ -397,18 +419,20 @@ export default async function HomePage() {
                   {page.final_cta.body}
                 </p>
               </div>
-              <a
-                href={`mailto:${siteConfig.contactEmail}`}
-                className="btn-primary shrink-0"
-              >
-                <span>{page.final_cta.cta_label}</span>
-                <span
-                  aria-hidden
-                  className="inline-block transition-transform group-hover:translate-x-0.5"
+              <Magnetic>
+                <a
+                  href={`mailto:${siteConfig.contactEmail}`}
+                  className="btn-primary group shrink-0"
                 >
-                  →
-                </span>
-              </a>
+                  <span>{page.final_cta.cta_label}</span>
+                  <span
+                    aria-hidden
+                    className="inline-block transition-transform duration-200 group-hover:translate-x-0.5"
+                  >
+                    →
+                  </span>
+                </a>
+              </Magnetic>
             </div>
           </section>
         </Reveal>
