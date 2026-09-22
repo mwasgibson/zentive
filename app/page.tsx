@@ -165,7 +165,7 @@ export default async function HomePage() {
               <p className="eyebrow">In plain terms</p>
               <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {page.glossary.items.map((item) => (
-                  <TiltCard key={item.title} maxTilt={7} className="card">
+                  <TiltCard key={item.title} maxTilt={8} className="card">
                     <h3 className="font-display text-lg font-semibold text-ink">
                       {item.title}
                     </h3>
