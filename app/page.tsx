@@ -47,10 +47,10 @@ export default async function HomePage() {
       />
       <SiteHeader productName={siteConfig.productName} />
       <main id="top">
-        {/* HERO */}
+        {/* HERO — diagram gets more column weight */}
         <section className="section relative overflow-hidden pb-20 pt-16 sm:pt-24">
           <DeliveryField />
-          <div className="grid items-center gap-14 lg:grid-cols-[1fr_1.15fr]">
+          <div className="grid items-center gap-10 lg:grid-cols-[0.9fr_1.35fr] lg:gap-12">
             <div>
               <HeroMotion delay={0}>
                 <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight text-ink sm:text-5xl">
@@ -70,12 +70,12 @@ export default async function HomePage() {
               </HeroMotion>
               <HeroMotion delay={220}>
                 <div className="mt-8 flex flex-wrap gap-4">
-                  <Magnetic>
+                  <Magnetic strength={0.6}>
                     <a href="#contact" className="btn-primary">
                       Request early access
                     </a>
                   </Magnetic>
-                  <Magnetic strength={0.18}>
+                  <Magnetic strength={0.5}>
                     <a href="#platform" className="btn-secondary">
                       {page.hero.secondary_cta_label}
                     </a>
@@ -94,8 +94,11 @@ export default async function HomePage() {
               </HeroMotion>
             </div>
             <HeroMotion delay={180}>
-              <TiltCard className="card flex items-center justify-center bg-surface p-4 sm:p-6">
-                <div className="w-full max-w-[110%]">
+              <TiltCard
+                maxTilt={10}
+                className="card flex items-center justify-center bg-surface p-3 sm:p-5"
+              >
+                <div className="w-full scale-105 sm:scale-110">
                   <RouteDiagram />
                 </div>
               </TiltCard>
@@ -103,7 +106,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* PLATFORM / FEATURES */}
+        {/* PLATFORM */}
         <Reveal variant="up">
           <section
             id="platform"
@@ -118,7 +121,7 @@ export default async function HomePage() {
           </section>
         </Reveal>
 
-        {/* SECURITY & COMPLIANCE */}
+        {/* SECURITY */}
         <Reveal variant="left">
           <MouseSpotlight
             id="security"
@@ -155,21 +158,21 @@ export default async function HomePage() {
           </MouseSpotlight>
         </Reveal>
 
-        {/* GLOSSARY */}
+        {/* GLOSSARY — tilt cards */}
         <Reveal variant="right">
           <section className="border-t border-border bg-surface py-16">
             <div className="section">
               <p className="eyebrow">In plain terms</p>
-              <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {page.glossary.items.map((item) => (
-                  <Proximity key={item.title}>
+                  <TiltCard key={item.title} maxTilt={7} className="card">
                     <h3 className="font-display text-lg font-semibold text-ink">
                       {item.title}
                     </h3>
                     <p className="mt-2 text-sm leading-relaxed text-muted">
                       {t(item.body)}
                     </p>
-                  </Proximity>
+                  </TiltCard>
                 ))}
               </div>
             </div>
@@ -233,7 +236,7 @@ export default async function HomePage() {
           </section>
         </Reveal>
 
-        {/* FOR ENGINEERING TEAMS */}
+        {/* ENGINEERING */}
         <Reveal variant="left">
           <section className="border-t border-border bg-surface py-20">
             <div className="section grid gap-12 lg:grid-cols-2 lg:items-center">
@@ -252,7 +255,7 @@ export default async function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <Magnetic strength={0.2} className="mt-8 inline-block">
+                <Magnetic strength={0.55} className="mt-8 inline-block">
                   <a
                     href={`mailto:${siteConfig.contactEmail}`}
                     className="btn-secondary"
@@ -261,12 +264,14 @@ export default async function HomePage() {
                   </a>
                 </Magnetic>
               </div>
-              <TerminalApi endpoints={page.engineering.api_endpoints} />
+              <TiltCard maxTilt={6}>
+                <TerminalApi endpoints={page.engineering.api_endpoints} />
+              </TiltCard>
             </div>
           </section>
         </Reveal>
 
-        {/* BY THE NUMBERS */}
+        {/* STATS */}
         <Reveal variant="scale">
           <section className="border-t border-border py-16">
             <div className="section">
@@ -345,8 +350,8 @@ export default async function HomePage() {
                 </h2>
                 <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {testimonials.map((testimonial) => (
-                    <Proximity key={testimonial.id}>
-                      <figure className="card flex flex-col justify-between">
+                    <TiltCard key={testimonial.id} maxTilt={7}>
+                      <figure className="card flex h-full flex-col justify-between">
                         <blockquote className="text-sm leading-relaxed text-ink">
                           &ldquo;{testimonial.quote}&rdquo;
                         </blockquote>
@@ -371,7 +376,7 @@ export default async function HomePage() {
                           </div>
                         </figcaption>
                       </figure>
-                    </Proximity>
+                    </TiltCard>
                   ))}
                 </div>
               </div>
@@ -419,7 +424,7 @@ export default async function HomePage() {
                   {page.final_cta.body}
                 </p>
               </div>
-              <Magnetic>
+              <Magnetic strength={0.6}>
                 <a
                   href={`mailto:${siteConfig.contactEmail}`}
                   className="btn-primary group shrink-0"

@@ -78,25 +78,6 @@
 }
 
 /* =========================================================
-   HEADER
-   ========================================================= */
-
-.site-header {
-  background: rgba(243, 245, 241, 0.72);
-  backdrop-filter: blur(10px) saturate(1.15);
-  -webkit-backdrop-filter: blur(10px) saturate(1.15);
-  border-bottom: 1px solid transparent;
-  transition:
-    background 280ms ease,
-    border-color 280ms ease;
-}
-
-.site-header.is-scrolled {
-  background: rgba(243, 245, 241, 0.92);
-  border-bottom-color: theme("colors.border");
-}
-
-/* =========================================================
    HERO
    ========================================================= */
 
@@ -178,7 +159,6 @@
     rgba(226, 113, 29, 0.12),
     transparent 55%
   );
-  transition: opacity 200ms ease;
 }
 
 .mouse-spotlight > * {
@@ -187,7 +167,7 @@
 }
 
 /* =========================================================
-   PROXIMITY (glossary / steps) — opacity only, no borders
+   PROXIMITY
    ========================================================= */
 
 .proximity {
@@ -228,22 +208,19 @@
   pointer-events: none;
 }
 
-/* Icons: no continuous float — proximity via parent instead */
-.security-item {
-  transition: opacity 220ms ease;
-  opacity: 0.88;
-}
-
-.security-item:hover {
-  opacity: 1;
-}
-
-.security-item:hover .security-icon {
-  transform: scale(1.08);
-}
-
+/* Floating security icons (restored) */
 .security-icon {
-  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: security-icon-float 3.5s ease-in-out infinite;
+}
+
+@keyframes security-icon-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
 }
 
 /* =========================================================
@@ -433,6 +410,10 @@ tr:hover .api-method {
     opacity: 0.42 !important;
     transform: none !important;
     filter: none !important;
+  }
+
+  .security-icon {
+    animation: none !important;
   }
 
   .how-step,
