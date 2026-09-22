@@ -233,59 +233,76 @@
   display: block;
 }
 
-/* Message — soft “ping” / send pulse on hover */
+/*
+ * Message — “send”: lifts and drifts up-right like a bubble leaving,
+ * then settles. Not a scale pulse.
+ */
 .platform-tab:hover .icon-msg svg {
-  animation: icon-msg-pulse 700ms ease-in-out;
+  animation: icon-msg-send 750ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-@keyframes icon-msg-pulse {
-  0%,
-  100% {
-    transform: scale(1);
+@keyframes icon-msg-send {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
   }
   35% {
-    transform: scale(1.12);
+    transform: translate(3px, -5px) rotate(8deg);
   }
   55% {
-    transform: scale(0.96);
-  }
-  75% {
-    transform: scale(1.06);
-  }
-}
-
-/* Shield — tighten / “lock in” */
-.platform-tab:hover .icon-shield svg {
-  animation: icon-shield-lock 650ms cubic-bezier(0.34, 1.4, 0.64, 1);
-}
-@keyframes icon-shield-lock {
-  0% {
-    transform: scale(1) translateY(0);
-  }
-  40% {
-    transform: scale(1.1) translateY(-1px);
+    transform: translate(4px, -7px) rotate(10deg);
+    opacity: 0.55;
   }
   70% {
-    transform: scale(0.94) translateY(1px);
+    transform: translate(-1px, 1px) rotate(-2deg);
+    opacity: 1;
   }
   100% {
-    transform: scale(1) translateY(0);
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
   }
 }
 
-/* Wallet — open / settle */
-.platform-tab:hover .icon-wallet svg {
-  animation: icon-wallet-open 700ms ease-in-out;
+/*
+ * Shield — “lock down”: drops hard, squashes, then seals.
+ * Vertical slam, not a bounce scale.
+ */
+.platform-tab:hover .icon-shield svg {
+  animation: icon-shield-seal 800ms cubic-bezier(0.34, 1.2, 0.64, 1);
+  transform-origin: center bottom;
 }
-@keyframes icon-wallet-open {
-  0%,
+@keyframes icon-shield-seal {
+  0% {
+    transform: translateY(-6px) scaleY(1.05);
+  }
+  45% {
+    transform: translateY(2px) scaleY(0.88);
+  }
+  65% {
+    transform: translateY(0) scaleY(1.06);
+  }
   100% {
-    transform: rotate(0deg) translateY(0);
+    transform: translateY(0) scaleY(1);
   }
-  30% {
-    transform: rotate(-8deg) translateY(-1px);
+}
+
+/*
+ * Wallet — “open flap”: swings open on the left hinge, then closes.
+ */
+.platform-tab:hover .icon-wallet svg {
+  animation: icon-wallet-flap 800ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: left center;
+}
+@keyframes icon-wallet-flap {
+  0% {
+    transform: perspective(80px) rotateY(0deg);
   }
-  60% {
-    transform: rotate(4deg) translateY(0);
+  40% {
+    transform: perspective(80px) rotateY(-42deg);
+  }
+  70% {
+    transform: perspective(80px) rotateY(-28deg);
+  }
+  100% {
+    transform: perspective(80px) rotateY(0deg);
   }
 }
 
