@@ -1,16 +1,24 @@
-export function FaqItem({ question, answer }: { question: string; answer: string }) {
+export function FaqItem({
+  question,
+  answer,
+}: {
+  question: string;
+  answer: string;
+}) {
   return (
     <details className="group border-b border-border py-5">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-lg text-ink">
+      <summary className="faq-summary flex cursor-pointer list-none items-center justify-between gap-4 font-display text-lg text-ink transition-colors duration-200 hover:text-signal-dark">
         {question}
         <span
           aria-hidden
-          className="shrink-0 font-mono text-xl text-muted transition group-open:rotate-45"
+          className="faq-plus shrink-0 font-mono text-xl text-muted transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-open:rotate-45"
         >
           +
         </span>
       </summary>
-      <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted">{answer}</p>
+      <p className="faq-answer mt-3 max-w-2xl text-[15px] leading-relaxed text-muted">
+        {answer}
+      </p>
     </details>
   );
 }
