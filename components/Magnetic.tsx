@@ -18,7 +18,6 @@ type MagneticCtx = {
 
 const MagneticContext = createContext<MagneticCtx | null>(null);
 
-/** Only one Magnetic inside the group is active at a time. */
 export function MagneticGroup({
   children,
   className = "",
@@ -35,11 +34,9 @@ export function MagneticGroup({
 }
 
 /**
- * Fixed layout slot + free-follow inner layer.
- * - Instant tracking while active (no stagger)
- * - Document-level pointer tracking so the button stays under the cursor
- *   and remains clickable even far from its rest position
- * - Springs home when the pointer leaves the button
+ * Layout slot stays fixed. Visible layer follows the pointer with a direct
+ * DOM transform (no React lag). Stays clickable anywhere it floats.
+ * Springs home when the pointer leaves the layer.
  */
 export function Magnetic({
   children,
@@ -52,35 +49,37 @@ export function Magnetic({
   const slotRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
   const origin = useRef({ x: 0, y: 0 });
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const activeRef = useRef(false);
   const [active, setActive] = useState(false);
   const [reduce, setReduce] = useState(false);
   const group = useContext(MagneticContext);
-  const activeRef = useRef(false);
 
   useEffect(() => {
     setReduce(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   }, []);
 
+  const applyTransform = useCallback((x: number, y: number, animate: boolean) => {
+    const el = layerRef.current;
+    if (!el) return;
+    el.style.transition = animate
+      ? "transform 480ms cubic-bezier(0.34, 1.4, 0.64, 1)"
+      : "none";
+    el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+  }, []);
+
   const release = useCallback(() => {
+    if (!activeRef.current) return;
     activeRef.current = false;
     setActive(false);
-    setOffset({ x: 0, y: 0 });
+    applyTransform(0, 0, true);
     if (group?.activeId === id) group.setActiveId(null);
-  }, [group, id]);
-
-  const follow = useCallback((clientX: number, clientY: number) => {
-    setOffset({
-      x: clientX - origin.current.x,
-      y: clientY - origin.current.y,
-    });
-  }, []);
+  }, [group, id, applyTransform]);
 
   const activate = useCallback(
     (clientX: number, clientY: number) => {
       if (reduce) return;
       if (group?.activeId && group.activeId !== id) return;
-      if (!slotRef.current) return;
+      if (!slotRef.current || !layerRef.current) return;
 
       const rect = slotRef.current.getBoundingClientRect();
       origin.current = {
@@ -91,49 +90,48 @@ export function Magnetic({
       group?.setActiveId(id);
       activeRef.current = true;
       setActive(true);
-      follow(clientX, clientY);
+
+      const x = clientX - origin.current.x;
+      const y = clientY - origin.current.y;
+      applyTransform(x, y, false);
     },
-    [reduce, group, id, follow],
+    [reduce, group, id, applyTransform],
   );
 
-  // Document-level tracking while active — keeps button under cursor + clickable
   useEffect(() => {
     if (!active) return;
 
     const onMove = (e: PointerEvent) => {
       if (!activeRef.current) return;
-      follow(e.clientX, e.clientY);
 
-      // Still over this button (or its children)?
-      const el = document.elementFromPoint(e.clientX, e.clientY);
+      const x = e.clientX - origin.current.x;
+      const y = e.clientY - origin.current.y;
+      applyTransform(x, y, false);
+
+      // After transform is applied synchronously, check hit target
+      const hit = document.elementFromPoint(e.clientX, e.clientY);
       const layer = layerRef.current;
-      if (!layer || !el || !layer.contains(el)) {
+      if (!layer || !hit || !layer.contains(hit)) {
         release();
       }
-    };
-
-    const onUp = () => {
-      // keep active until pointer leaves; clicks still work on the <a>
     };
 
     const onCancel = () => release();
 
     document.addEventListener("pointermove", onMove, { passive: true });
-    document.addEventListener("pointerup", onUp, { passive: true });
     document.addEventListener("pointercancel", onCancel, { passive: true });
 
     return () => {
       document.removeEventListener("pointermove", onMove);
-      document.removeEventListener("pointerup", onUp);
       document.removeEventListener("pointercancel", onCancel);
     };
-  }, [active, follow, release]);
+  }, [active, applyTransform, release]);
 
   useEffect(() => {
-    if (group && group.activeId !== id && active) {
+    if (group && group.activeId !== id && activeRef.current) {
       release();
     }
-  }, [group, id, active, release]);
+  }, [group, id, release]);
 
   const blocked = Boolean(group?.activeId && group.activeId !== id);
 
@@ -154,15 +152,10 @@ export function Magnetic({
           activate(e.clientX, e.clientY);
         }}
         style={{
-          transform: `translate3d(${offset.x}px, ${offset.y}px, 0)`,
-          // Instant while dragging — no stagger; spring only on release
-          transition: active
-            ? "none"
-            : "transform 480ms cubic-bezier(0.34, 1.4, 0.64, 1)",
-          willChange: active ? "transform" : undefined,
           zIndex: active ? 50 : blocked ? 1 : 10,
           pointerEvents: blocked ? "none" : "auto",
           position: "relative",
+          willChange: active ? "transform" : undefined,
         }}
       >
         {children}
