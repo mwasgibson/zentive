@@ -42,7 +42,27 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper transition duration-fast hover:bg-signal-dark active:scale-[0.98];
+    @apply relative inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper transition duration-fast hover:bg-signal-dark active:scale-[0.98];
+    isolation: isolate;
+  }
+
+  .btn-primary::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 9999px;
+    background: radial-gradient(
+      circle at 50% 0%,
+      rgba(226, 113, 29, 0.25),
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 300ms ease;
+    z-index: -1;
+  }
+
+  .btn-primary:hover::before {
+    opacity: 1;
   }
 
   .btn-secondary {
@@ -58,7 +78,26 @@
 }
 
 /* =========================================================
-   HERO SIGNAL
+   HEADER
+   ========================================================= */
+
+.site-header {
+  background: rgba(243, 245, 241, 0.72);
+  backdrop-filter: blur(10px) saturate(1.15);
+  -webkit-backdrop-filter: blur(10px) saturate(1.15);
+  border-bottom: 1px solid transparent;
+  transition:
+    background 280ms ease,
+    border-color 280ms ease;
+}
+
+.site-header.is-scrolled {
+  background: rgba(243, 245, 241, 0.92);
+  border-bottom-color: theme("colors.border");
+}
+
+/* =========================================================
+   HERO
    ========================================================= */
 
 .hero-signal {
@@ -77,41 +116,6 @@
     #f8f6f1;
 }
 
-.hero-signal-grid {
-  background-image:
-    linear-gradient(to right, rgba(20, 20, 20, 0.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(20, 20, 20, 0.045) 1px, transparent 1px);
-
-  background-size: 28px 28px;
-
-  mask-image: linear-gradient(to bottom, black, transparent 90%);
-}
-
-.hero-signal-glow {
-  background: rgba(226, 113, 29, 0.1);
-  filter: blur(60px);
-  pointer-events: none;
-}
-
-.hero-message-animation {
-  animation: hero-message-enter 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.hero-route-line {
-  width: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(226, 113, 29, 0.25) 15%,
-    rgba(226, 113, 29, 0.8) 50%,
-    rgba(226, 113, 29, 0.25) 85%,
-    transparent 100%
-  );
-
-  transform-origin: left;
-  animation: route-line-flow 2.4s ease-in-out infinite;
-}
-
 .delivery-status {
   position: absolute;
   display: inline-block;
@@ -126,38 +130,27 @@
     var(--delivery-delay) infinite;
 }
 
-/*
- * Cycle length: 4.4s (2 × 2.2s interval)
- * - 0–15%: fade in
- * - 15–55%: fully visible (lingers)
- * - 55–70%: fade out
- * - 70–100%: hidden
- */
 @keyframes delivery-status-cycle {
   0% {
     opacity: 0;
     transform: translateY(5px);
     filter: blur(3px);
   }
-
   15% {
     opacity: 0.42;
     transform: translateY(0);
     filter: blur(0);
   }
-
   55% {
     opacity: 0.42;
     transform: translateY(0);
     filter: blur(0);
   }
-
   70% {
     opacity: 0;
     transform: translateY(-5px);
     filter: blur(3px);
   }
-
   100% {
     opacity: 0;
     transform: translateY(-5px);
@@ -165,13 +158,45 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .delivery-status {
-    animation: none;
-    opacity: 0.42;
-    transform: none;
-    filter: none;
-  }
+/* =========================================================
+   MOUSE SPOTLIGHT (dark sections)
+   ========================================================= */
+
+.mouse-spotlight {
+  position: relative;
+  isolation: isolate;
+}
+
+.mouse-spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    600px circle at var(--spot-x, 50%) var(--spot-y, 40%),
+    rgba(226, 113, 29, 0.12),
+    transparent 55%
+  );
+  transition: opacity 200ms ease;
+}
+
+.mouse-spotlight > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================================================
+   PROXIMITY (glossary / steps) — opacity only, no borders
+   ========================================================= */
+
+.proximity {
+  opacity: var(--prox, 0.72);
+  transition: opacity 220ms ease;
+}
+
+.proximity.is-near {
+  opacity: 1;
 }
 
 /* =========================================================
@@ -187,33 +212,12 @@
   animation: stagger-up 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-.reveal-stagger.is-visible > *:nth-child(1) {
-  animation-delay: 80ms;
-}
-
-.reveal-stagger.is-visible > *:nth-child(2) {
-  animation-delay: 150ms;
-}
-
-.reveal-stagger.is-visible > *:nth-child(3) {
-  animation-delay: 220ms;
-}
-
-.reveal-stagger.is-visible > *:nth-child(4) {
-  animation-delay: 290ms;
-}
-
-.reveal-stagger.is-visible > *:nth-child(5) {
-  animation-delay: 360ms;
-}
-
-.reveal-stagger.is-visible > *:nth-child(6) {
-  animation-delay: 430ms;
-}
-
-.security-icon {
-  animation: security-icon-float 3.5s ease-in-out infinite;
-}
+.reveal-stagger.is-visible > *:nth-child(1) { animation-delay: 80ms; }
+.reveal-stagger.is-visible > *:nth-child(2) { animation-delay: 150ms; }
+.reveal-stagger.is-visible > *:nth-child(3) { animation-delay: 220ms; }
+.reveal-stagger.is-visible > *:nth-child(4) { animation-delay: 290ms; }
+.reveal-stagger.is-visible > *:nth-child(5) { animation-delay: 360ms; }
+.reveal-stagger.is-visible > *:nth-child(6) { animation-delay: 430ms; }
 
 .security-grid {
   background-image:
@@ -221,38 +225,50 @@
     linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 24px 24px;
   mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 80%);
+  pointer-events: none;
 }
 
-@keyframes security-icon-float {
-  0%,
-  100% {
+/* Icons: no continuous float — proximity via parent instead */
+.security-item {
+  transition: opacity 220ms ease;
+  opacity: 0.88;
+}
+
+.security-item:hover {
+  opacity: 1;
+}
+
+.security-item:hover .security-icon {
+  transform: scale(1.08);
+}
+
+.security-icon {
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* =========================================================
+   FAQ
+   ========================================================= */
+
+.faq-answer {
+  animation: faq-open 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes faq-open {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
     transform: translateY(0);
   }
-  50% {
-    transform: translateY(-2px);
-  }
 }
 
 /* =========================================================
-   CARD HOVER
+   API / TERMINAL
    ========================================================= */
 
-.card-motion {
-  transition:
-    transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 300ms ease;
-}
-
-.card-motion:hover {
-  transform: translateY(-5px);
-  border-color: rgba(20, 20, 20, 0.18);
-}
-
-/* =========================================================
-   API / TERMINAL MOTION
-   ========================================================= */
-
-/* Terminal scanlines overlay */
 .api-scanlines {
   background: repeating-linear-gradient(
     to bottom,
@@ -265,7 +281,6 @@
   mix-blend-mode: overlay;
 }
 
-/* API row enter animation */
 .api-row {
   opacity: 0;
   transform: translateX(-8px);
@@ -273,29 +288,21 @@
 }
 
 @keyframes api-row-enter {
-  0% {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-  100% {
+  to {
     opacity: 1;
     transform: translateX(0);
   }
 }
 
-/* Method highlight on hover */
 .api-method {
-  transition:
-    color 200ms ease,
-    text-shadow 200ms ease;
+  transition: color 200ms ease, text-shadow 200ms ease;
 }
 
 tr:hover .api-method {
-  color: #e2711d; /* signal-dark */
+  color: #e2711d;
   text-shadow: 0 0 10px rgba(226, 113, 29, 0.35);
 }
 
-/* Blinking cursor in the prompt line */
 .terminal-cursor {
   display: inline-block;
   width: 0.35ch;
@@ -305,128 +312,42 @@ tr:hover .api-method {
 }
 
 @keyframes terminal-blink {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .api-row {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-
-  .terminal-cursor {
-    animation: none;
-    opacity: 1;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 /* =========================================================
    KEYFRAMES
    ========================================================= */
 
-@keyframes hero-message-enter {
-  0% {
-    opacity: 0;
-    transform: translateY(14px);
-    filter: blur(5px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-}
-
-@keyframes route-line-flow {
-  0% {
-    opacity: 0.25;
-    transform: scaleX(0.3);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-
-  100% {
-    opacity: 0.25;
-    transform: scaleX(0.3);
-  }
-}
-
 @keyframes stagger-up {
-  0% {
+  from {
     opacity: 0;
     transform: translateY(18px);
   }
-
-  100% {
+  to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-@keyframes api-row-enter {
-  0% {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/*
- * Kept from the original design language.
- * Useful if RouteDiagram is still used elsewhere.
- */
 @keyframes route-pulse {
-  0% {
-    transform: translateX(0);
-    opacity: 0;
-  }
-
-  8% {
-    opacity: 1;
-  }
-
-  92% {
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateX(480px);
-    opacity: 0;
-  }
+  0% { transform: translateX(0); opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { transform: translateX(480px); opacity: 0; }
 }
 
-/*
- * Aggregator-route dot: same idea as route-pulse, but it stalls at every
- * intermediate hop (Aggregator, Upstream reseller, SMSC) instead of
- * gliding straight through, and takes twice as long per lap. The pauses
- * and the slower cycle are the point — this is what "more hops" looks
- * like next to the direct route's one uninterrupted pass.
- */
-/*
- * Thin fill bar along the bottom of the active platform tab, showing
- * how long until it auto-advances. animation-play-state is toggled
- * from React (paused on hover/focus, on a hidden tab, or once the
- * person clicks a tab themselves) — the keyframe itself just fills
- * left to right over the duration React sets inline.
- */
+@keyframes route-pulse-aggregator {
+  0% { transform: translateX(0); opacity: 0; }
+  3% { opacity: 1; }
+  20%, 32% { transform: translateX(104px); }
+  50%, 62% { transform: translateX(244px); }
+  80%, 90% { transform: translateX(384px); }
+  97% { opacity: 1; }
+  100% { transform: translateX(500px); opacity: 0; }
+}
+
 .tab-progress-bar {
   position: absolute;
   bottom: 0;
@@ -442,47 +363,50 @@ tr:hover .api-method {
 }
 
 @keyframes tab-progress-fill {
-  from {
-    transform: scaleX(0);
-  }
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
 
-  to {
-    transform: scaleX(1);
+@keyframes queue-burst {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0.85;
+  }
+  20% {
+    opacity: 1;
+  }
+  55% {
+    transform: translate(118px, 0);
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0.1;
+  }
+  100% {
+    transform: translate(118px, 0);
+    opacity: 0;
   }
 }
 
-@keyframes route-pulse-aggregator {
-  0% {
+.how-step {
+  opacity: 0;
+  animation: stagger-up 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.how-arrow {
+  opacity: 0;
+  animation: arrow-enter 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 450ms;
+}
+
+@keyframes arrow-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
     transform: translateX(0);
-    opacity: 0;
-  }
-
-  3% {
-    opacity: 1;
-  }
-
-  20%,
-  32% {
-    transform: translateX(104px);
-  }
-
-  50%,
-  62% {
-    transform: translateX(244px);
-  }
-
-  80%,
-  90% {
-    transform: translateX(384px);
-  }
-
-  97% {
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateX(500px);
-    opacity: 0;
   }
 }
 
@@ -504,65 +428,27 @@ tr:hover .api-method {
     scroll-behavior: auto !important;
   }
 
-  .hero-message-animation,
-  .hero-route-line {
+  .delivery-status {
     animation: none !important;
-  }
-}
-
-.how-step {
-  opacity: 0;
-  animation: stagger-up 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.how-arrow {
-  opacity: 0;
-  animation: arrow-enter 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: 450ms;
-}
-
-@keyframes arrow-enter {
-  0% {
-    opacity: 0;
-    transform: translateX(-8px);
+    opacity: 0.42 !important;
+    transform: none !important;
+    filter: none !important;
   }
 
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
   .how-step,
   .how-arrow,
-  .api-row {
+  .api-row,
+  .faq-answer {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
   }
-}
 
-.btn-primary {
-  position: relative;
-  isolation: isolate;
-}
+  .mouse-spotlight::before {
+    display: none;
+  }
 
-.btn-primary::before {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: 9999px;
-  background: radial-gradient(
-    circle at 50% 0%,
-    rgba(226, 113, 29, 0.25),
-    transparent 60%
-  );
-  opacity: 0;
-  transition: opacity 300ms ease;
-  z-index: -1;
-}
-
-.btn-primary:hover::before {
-  opacity: 1;
+  .proximity {
+    opacity: 1 !important;
+  }
 }
