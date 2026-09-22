@@ -10,6 +10,7 @@ import {
   RefreshCw,
   type LucideIcon,
 } from "lucide-react";
+import { TiltCard } from "@/components/TiltCard";
 
 type FeatureGroup = {
   category: string;
@@ -25,7 +26,6 @@ const CATEGORY_ICON_MAP: Record<string, LucideIcon> = {
   Reliability: RefreshCw,
 };
 
-/** CSS class that drives the icon’s hover-only motion */
 const CATEGORY_ICON_ANIM: Record<string, string> = {
   "Core messaging": "icon-msg",
   "Compliance & trust": "icon-shield",
@@ -133,8 +133,7 @@ export function PlatformTabs({ groups }: { groups: FeatureGroup[] }) {
       >
         {groups.map((group, i) => {
           const Icon = CATEGORY_ICON_MAP[group.category] ?? MessageSquare;
-          const iconAnim =
-            CATEGORY_ICON_ANIM[group.category] ?? "icon-msg";
+          const iconAnim = CATEGORY_ICON_ANIM[group.category] ?? "icon-msg";
           const isActive = i === activeIndex;
           return (
             <button
@@ -185,27 +184,29 @@ export function PlatformTabs({ groups }: { groups: FeatureGroup[] }) {
         })}
       </div>
 
-      <div
-        key={activeIndex}
-        id={`${baseId}-panel-${activeIndex}`}
-        role="tabpanel"
-        aria-labelledby={`${baseId}-tab-${activeIndex}`}
-        tabIndex={0}
-        className="card"
-      >
-        <ul className="grid gap-2.5 sm:grid-cols-2">
-          {active.items.map((item, i) => (
-            <li
-              key={item}
-              className="feature-chip"
-              style={{ animationDelay: `${60 + i * 55}ms` }}
-            >
-              <span className="feature-chip-dot" aria-hidden />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <TiltCard maxTilt={5} className="feature-panel-3d">
+        <div
+          key={activeIndex}
+          id={`${baseId}-panel-${activeIndex}`}
+          role="tabpanel"
+          aria-labelledby={`${baseId}-tab-${activeIndex}`}
+          tabIndex={0}
+          className="card feature-panel"
+        >
+          <ul className="grid gap-2.5 sm:grid-cols-2">
+            {active.items.map((item, i) => (
+              <li
+                key={item}
+                className="feature-chip"
+                style={{ animationDelay: `${60 + i * 55}ms` }}
+              >
+                <span className="feature-chip-dot" aria-hidden />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </TiltCard>
     </div>
   );
 }
