@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Proximity } from "@/components/Proximity";
 
 type Step = {
@@ -56,9 +56,14 @@ export function HowItWorks({
     return () => window.clearTimeout(t);
   }, [active, running, steps.length]);
 
-  /* Path fill: progress toward next step (0 → 1 across all segments) */
   const pathProgress =
     steps.length <= 1 ? 1 : active / (steps.length - 1);
+
+  const pathStyle: CSSProperties = reducedMotion
+    ? { transform: "scaleX(1)" }
+    : {
+        transform: `scaleX(${inView ? Math.max(0.08, pathProgress) : 0})`,
+      };
 
   return (
     <div ref={rootRef}>
@@ -72,17 +77,8 @@ export function HowItWorks({
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        {/* Draw path — desktop only */}
         <div className="how-path" aria-hidden>
-          <div
-            className="how-path-track"
-            style=
-              reducedMotion
-                ? { transform: "scaleX(1)" }
-                : {
-                    transform: `scaleX(${inView ? Math.max(0.08, pathProgress) : 0})`,
-                  }
-          />
+          <div className="how-path-track" style={pathStyle} />
         </div>
 
         <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -95,12 +91,7 @@ export function HowItWorks({
                   "how-step relative",
                   isActive ? "is-active" : "",
                 ].join(" ")}
-                style=
-                  {
-                    {
-                      animationDelay: `${i * 120}ms`,
-                    } as React.CSSProperties
-                  }
+                style={{ animationDelay: `${i * 120}ms` }}
               >
                 <span
                   className={[
