@@ -47,7 +47,7 @@ export default async function HomePage() {
       />
       <SiteHeader productName={siteConfig.productName} />
       <main id="top">
-        {/* HERO — diagram gets more column weight */}
+        {/* HERO — diagram gets more column weight, stays inside card */}
         <section className="section relative overflow-hidden pb-20 pt-16 sm:pt-24">
           <DeliveryField />
           <div className="grid items-center gap-10 lg:grid-cols-[0.9fr_1.35fr] lg:gap-12">
@@ -95,10 +95,10 @@ export default async function HomePage() {
             </div>
             <HeroMotion delay={180}>
               <TiltCard
-                maxTilt={10}
-                className="card flex items-center justify-center bg-surface p-3 sm:p-5"
+                maxTilt={8}
+                className="card overflow-hidden bg-surface p-4 sm:p-6"
               >
-                <div className="w-full scale-105 sm:scale-110">
+                <div className="w-full overflow-hidden">
                   <RouteDiagram />
                 </div>
               </TiltCard>
@@ -393,7 +393,7 @@ export default async function HomePage() {
                   Straight answers, before you talk to us.
                 </h2>
                 <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
-                  Don&apos;t see your question here? Reach us directly at{" "}
+                  Don't see your question here? Reach us directly at{" "}
                   <a
                     href={`mailto:${siteConfig.contactEmail}`}
                     className="text-ink underline"
