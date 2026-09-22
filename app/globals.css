@@ -460,6 +460,11 @@
   }
 }
 
+/* Glossary — warm paper fill so cards read against surface */
+.glossary-card {
+  background: #efece6;
+}
+
 /* =========================================================
    SECURITY
    ========================================================= */
@@ -490,7 +495,6 @@
   animation: stagger-up 600ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* Idle float on wrap; hover boost on SVG only (no color change) */
 .security-icon-wrap {
   display: inline-flex;
   animation: security-icon-float 3.5s ease-in-out infinite;
@@ -526,7 +530,6 @@
   }
 }
 
-/* Text brightens when hovering the copy itself */
 .security-title {
   transition: color 200ms ease;
 }
