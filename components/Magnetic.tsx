@@ -35,15 +35,18 @@ export function MagneticGroup({
 
 /**
  * Layout slot stays fixed. Visible layer follows the pointer with a direct
- * DOM transform (no React lag). Stays clickable anywhere it floats.
- * Springs home when the pointer leaves the layer.
+ * DOM transform. Optional `bounds` keeps it inside a region:
+ *  - "section" → closest <section> (e.g. stop at footer)
+ *  - "parent"  → immediate parent (e.g. stay off the terminal column)
  */
 export function Magnetic({
   children,
   className = "",
+  bounds = "section",
 }: {
   children: ReactNode;
   className?: string;
+  bounds?: "section" | "parent" | "none";
 }) {
   const id = useId();
   const slotRef = useRef<HTMLDivElement>(null);
@@ -57,6 +60,39 @@ export function Magnetic({
   useEffect(() => {
     setReduce(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   }, []);
+
+  const getBoundsEl = useCallback((): HTMLElement | null => {
+    const slot = slotRef.current;
+    if (!slot || bounds === "none") return null;
+    if (bounds === "parent") return slot.parentElement;
+    return slot.closest("section");
+  }, [bounds]);
+
+  const clampOffset = useCallback(
+    (x: number, y: number): { x: number; y: number } => {
+      const layer = layerRef.current;
+      const box = getBoundsEl();
+      if (!layer || !box) return { x, y };
+
+      const br = box.getBoundingClientRect();
+      const lw = layer.offsetWidth;
+      const lh = layer.offsetHeight;
+      const pad = 8;
+
+      // Desired center in viewport
+      let cx = origin.current.x + x;
+      let cy = origin.current.y + y;
+
+      cx = Math.min(br.right - pad - lw / 2, Math.max(br.left + pad + lw / 2, cx));
+      cy = Math.min(br.bottom - pad - lh / 2, Math.max(br.top + pad + lh / 2, cy));
+
+      return {
+        x: cx - origin.current.x,
+        y: cy - origin.current.y,
+      };
+    },
+    [getBoundsEl],
+  );
 
   const applyTransform = useCallback((x: number, y: number, animate: boolean) => {
     const el = layerRef.current;
@@ -91,11 +127,13 @@ export function Magnetic({
       activeRef.current = true;
       setActive(true);
 
-      const x = clientX - origin.current.x;
-      const y = clientY - origin.current.y;
-      applyTransform(x, y, false);
+      const next = clampOffset(
+        clientX - origin.current.x,
+        clientY - origin.current.y,
+      );
+      applyTransform(next.x, next.y, false);
     },
-    [reduce, group, id, applyTransform],
+    [reduce, group, id, clampOffset, applyTransform],
   );
 
   useEffect(() => {
@@ -104,11 +142,12 @@ export function Magnetic({
     const onMove = (e: PointerEvent) => {
       if (!activeRef.current) return;
 
-      const x = e.clientX - origin.current.x;
-      const y = e.clientY - origin.current.y;
-      applyTransform(x, y, false);
+      const next = clampOffset(
+        e.clientX - origin.current.x,
+        e.clientY - origin.current.y,
+      );
+      applyTransform(next.x, next.y, false);
 
-      // After transform is applied synchronously, check hit target
       const hit = document.elementFromPoint(e.clientX, e.clientY);
       const layer = layerRef.current;
       if (!layer || !hit || !layer.contains(hit)) {
@@ -125,7 +164,7 @@ export function Magnetic({
       document.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointercancel", onCancel);
     };
-  }, [active, applyTransform, release]);
+  }, [active, clampOffset, applyTransform, release]);
 
   useEffect(() => {
     if (group && group.activeId !== id && activeRef.current) {
