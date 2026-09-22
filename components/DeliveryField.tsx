@@ -4,42 +4,43 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const STATUSES = ["Queued", "Sending", "Sent", "Delivered", "Failed"] as const;
 
-const COLOR_CLASS = {
-  wire: "text-wire",
-  "signal-dark": "text-signal-dark",
-} as const;
+/** Visual variants so bubbles don’t all look the same */
+const BUBBLE_VARIANTS = [
+  "bubble-a", // ink fill, paper text, tail bottom-left
+  "bubble-b", // paper fill, border, tail bottom-right
+  "bubble-c", // signal tint fill, tail bottom-left
+  "bubble-d", // wire tint fill, tail bottom-right
+  "bubble-e", // outline only, tail top-left
+] as const;
 
 type Particle = {
   id: number;
   x: number;
   y: number;
   label: (typeof STATUSES)[number];
-  color: keyof typeof COLOR_CLASS;
+  variant: (typeof BUBBLE_VARIANTS)[number];
 };
 
-function randomMeta(id: number, x: number, y: number): Particle {
+function makeParticle(id: number, x: number, y: number): Particle {
   return {
     id,
     x,
     y,
     label: STATUSES[Math.floor(Math.random() * STATUSES.length)],
-    color: Math.random() > 0.5 ? "wire" : "signal-dark",
+    variant: BUBBLE_VARIANTS[Math.floor(Math.random() * BUBBLE_VARIANTS.length)],
   };
 }
 
 function randomPosition(): { x: number; y: number } {
   return {
-    x: 4 + Math.random() * 90,
-    y: 6 + Math.random() * 86,
+    x: 4 + Math.random() * 88,
+    y: 6 + Math.random() * 84,
   };
 }
 
-/** Lifetime of one label — must match CSS animation duration */
 const LIFE_MS = 4200;
-/** How often a new label appears on its own */
 const SPAWN_MS = 850;
 
-/** Elements that should NOT trigger a spawn when tapped */
 const INTERACTIVE =
   'a, button, input, textarea, select, summary, [role="button"], [data-no-spawn]';
 
@@ -50,16 +51,14 @@ export function DeliveryField() {
 
   const spawnAt = useCallback((x: number, y: number) => {
     const id = ++nextId.current;
-    // Clamp so labels stay inside the field
-    const cx = Math.min(96, Math.max(2, x));
-    const cy = Math.min(96, Math.max(2, y));
-    setItems((prev) => [...prev, randomMeta(id, cx, cy)].slice(-14));
+    const cx = Math.min(94, Math.max(2, x));
+    const cy = Math.min(94, Math.max(2, y));
+    setItems((prev) => [...prev, makeParticle(id, cx, cy)].slice(-14));
     window.setTimeout(() => {
       setItems((prev) => prev.filter((p) => p.id !== id));
     }, LIFE_MS);
   }, []);
 
-  // Auto-spawn at random positions (never stops)
   useEffect(() => {
     const spawn = () => {
       const { x, y } = randomPosition();
@@ -78,18 +77,15 @@ export function DeliveryField() {
     };
   }, [spawnAt]);
 
-  // Tap / click empty space in the hero → spawn at that point
   useEffect(() => {
     const field = rootRef.current;
     const section = field?.parentElement;
     if (!section) return;
 
     const onPointerDown = (e: PointerEvent) => {
-      // Ignore real UI controls
       const target = e.target as HTMLElement | null;
       if (!target) return;
       if (target.closest(INTERACTIVE)) return;
-      // Ignore the route diagram card
       if (target.closest(".card")) return;
 
       const rect = section.getBoundingClientRect();
@@ -113,13 +109,13 @@ export function DeliveryField() {
       {items.map((item) => (
         <span
           key={item.id}
-          className={`delivery-status ${COLOR_CLASS[item.color]}`}
+          className={`delivery-bubble ${item.variant}`}
           style={{
             left: `${item.x}%`,
             top: `${item.y}%`,
           }}
         >
-          {item.label}
+          <span className="delivery-bubble-text">{item.label}</span>
         </span>
       ))}
     </div>
