@@ -464,7 +464,6 @@
    SECURITY
    ========================================================= */
 
-/* Visible grid — stronger lines, wider mask */
 .security-grid {
   position: absolute;
   inset: 0;
@@ -486,13 +485,12 @@
   );
 }
 
-/* Rows stagger in */
 .security-item {
   opacity: 0;
   animation: stagger-up 600ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* Idle float lives on the wrap so hover can animate the SVG separately */
+/* Idle float on wrap; hover boost on SVG only (no color change) */
 .security-icon-wrap {
   display: inline-flex;
   animation: security-icon-float 3.5s ease-in-out infinite;
@@ -500,12 +498,9 @@
 
 .security-icon {
   display: block;
-  transition: color 200ms ease;
 }
 
-/* Hover icon → boost beat (float continues on wrap) */
 .security-icon-wrap:hover .security-icon {
-  color: #e2711d;
   animation: security-icon-boost 520ms cubic-bezier(0.34, 1.5, 0.64, 1);
 }
 
@@ -531,24 +526,20 @@
   }
 }
 
-/* Title / body react when the icon is hovered */
+/* Text brightens when hovering the copy itself */
 .security-title {
-  transition:
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    color 200ms ease;
+  transition: color 200ms ease;
 }
 
 .security-body {
-  transition:
-    color 220ms ease,
-    opacity 220ms ease;
+  transition: color 220ms ease;
 }
 
-.security-item:has(.security-icon-wrap:hover) .security-title {
-  transform: translateX(3px);
+.security-copy:hover .security-title {
+  color: #f3f5f1;
 }
 
-.security-item:has(.security-icon-wrap:hover) .security-body {
+.security-copy:hover .security-body {
   color: rgba(243, 245, 241, 0.95);
 }
 
@@ -579,7 +570,6 @@
   z-index: 1;
 }
 
-/* Grid must stay behind content */
 .mouse-spotlight > .security-grid {
   z-index: 0;
 }
