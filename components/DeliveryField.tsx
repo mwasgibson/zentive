@@ -1,25 +1,29 @@
-"use client";
-
 /**
  * Ambient delivery-status labels in the hero.
- * Each field keeps a fixed label so CSS fade cycles aren’t restarted by
- * React text updates (which also made words flash on re-render / tap).
+ * Pure CSS cycle (no React state) so taps / re-renders never restart or
+ * spawn labels. Words keep rotating: Queued → Sending → Sent → …
  */
+const STATUSES = ["Queued", "Sending", "Sent", "Delivered", "Failed"] as const;
+
 const STATUS_FIELDS = [
-  { x: "6%", y: "18%", delay: 0, color: "wire", label: "Queued" },
-  { x: "88%", y: "12%", delay: 1400, color: "signal-dark", label: "Delivered" },
-  { x: "94%", y: "58%", delay: 2800, color: "wire", label: "Sending" },
-  { x: "12%", y: "78%", delay: 700, color: "signal-dark", label: "Failed" },
-  { x: "72%", y: "84%", delay: 2100, color: "wire", label: "Sent" },
-  { x: "38%", y: "8%", delay: 3500, color: "signal-dark", label: "Queued" },
-  { x: "58%", y: "94%", delay: 300, color: "wire", label: "Delivered" },
-  { x: "22%", y: "42%", delay: 2500, color: "signal-dark", label: "Sending" },
+  { x: "6%", y: "18%", delay: 0, color: "wire" },
+  { x: "88%", y: "12%", delay: 1.4, color: "signal-dark" },
+  { x: "94%", y: "58%", delay: 2.8, color: "wire" },
+  { x: "12%", y: "78%", delay: 0.7, color: "signal-dark" },
+  { x: "72%", y: "84%", delay: 2.1, color: "wire" },
+  { x: "38%", y: "8%", delay: 3.5, color: "signal-dark" },
+  { x: "58%", y: "94%", delay: 0.3, color: "wire" },
+  { x: "22%", y: "42%", delay: 2.5, color: "signal-dark" },
 ] as const;
 
 const COLOR_CLASS = {
   wire: "text-wire",
   "signal-dark": "text-signal-dark",
 } as const;
+
+// Full cycle length in seconds (must match CSS)
+const CYCLE = 10;
+const SLOT = CYCLE / STATUSES.length; // 2s per status
 
 export function DeliveryField() {
   return (
@@ -30,16 +34,26 @@ export function DeliveryField() {
       {STATUS_FIELDS.map((field) => (
         <span
           key={`${field.x}-${field.y}`}
-          className={`delivery-status ${COLOR_CLASS[field.color]}`}
-          style={
-            {
-              left: field.x,
-              top: field.y,
-              "--delivery-delay": `${field.delay}ms`,
-            } as React.CSSProperties
-          }
+          className="delivery-status-slot"
+          style={{
+            left: field.x,
+            top: field.y,
+          }}
         >
-          {field.label}
+          {STATUSES.map((label, i) => (
+            <span
+              key={label}
+              className={`delivery-status ${COLOR_CLASS[field.color]}`}
+              style={
+                {
+                  // Stagger field start + which status is showing
+                  animationDelay: `${field.delay + i * SLOT}s`,
+                } as React.CSSProperties
+              }
+            >
+              {label}
+            </span>
+          ))}
         </span>
       ))}
     </div>

@@ -78,7 +78,7 @@
 }
 
 /* =========================================================
-   HERO
+   HERO — delivery status field
    ========================================================= */
 
 .hero-signal {
@@ -97,9 +97,23 @@
     #f8f6f1;
 }
 
+/* Slot anchors a stack of status words at a fixed position */
+.delivery-status-slot {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+}
+
+/*
+ * 10s cycle, 5 statuses → each word is “on” for ~2s of the loop.
+ * No blur. Stronger opacity for presence.
+ * Pure CSS — no JS updates, so taps never restart or spawn labels.
+ */
 .delivery-status {
   position: absolute;
-  display: inline-block;
+  left: 0;
+  top: 0;
+  display: block;
   white-space: nowrap;
   font-family: theme("fontFamily.mono");
   font-size: 0.7rem;
@@ -108,33 +122,34 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   opacity: 0;
-  filter: none;
   pointer-events: none;
-  animation: delivery-status-cycle 5s cubic-bezier(0.22, 1, 0.36, 1)
-    var(--delivery-delay) infinite;
+  user-select: none;
+  animation: delivery-status-cycle 10s cubic-bezier(0.22, 1, 0.36, 1) infinite;
 }
 
-/* Stronger presence: higher opacity, no blur */
 @keyframes delivery-status-cycle {
+  /* fade in */
   0% {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(5px);
   }
-  12% {
-    opacity: 0.78;
+  3% {
+    opacity: 0.8;
     transform: translateY(0);
   }
-  55% {
-    opacity: 0.78;
+  /* hold (~2s of 10s = 20%) */
+  17% {
+    opacity: 0.8;
     transform: translateY(0);
   }
-  72% {
+  /* fade out */
+  20% {
     opacity: 0;
-    transform: translateY(-6px);
+    transform: translateY(-5px);
   }
   100% {
     opacity: 0;
-    transform: translateY(-6px);
+    transform: translateY(-5px);
   }
 }
 
@@ -405,9 +420,12 @@ tr:hover .api-method {
 
   .delivery-status {
     animation: none !important;
+    opacity: 0 !important;
+  }
+
+  .delivery-status-slot .delivery-status:first-child {
     opacity: 0.65 !important;
     transform: none !important;
-    filter: none !important;
   }
 
   .security-icon {
