@@ -46,10 +46,6 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
   }, [endpoints]);
 
   useEffect(() => {
-    inputRef.current?.focus();
-  }, [logs.length]);
-
-  useEffect(() => {
     containerRef.current?.scrollTo({
       top: containerRef.current.scrollHeight,
       behavior: "smooth",
