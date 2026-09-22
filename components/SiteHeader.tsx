@@ -14,15 +14,7 @@ const navItems = [
 ];
 
 export function SiteHeader({ productName }: { productName: string }) {
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -38,11 +30,7 @@ export function SiteHeader({ productName }: { productName: string }) {
   }, [open]);
 
   return (
-    <header
-      className={["site-header sticky top-0 z-40", scrolled ? "is-scrolled" : ""].join(
-        " ",
-      )}
-    >
+    <header className="sticky top-0 z-40">
       <div className="relative flex h-16 w-full items-center justify-between px-4 sm:px-8">
         <a href="#top" className="group relative z-50 inline-flex items-center">
           <div className="relative rounded-2xl rounded-bl-sm bg-ink/95 px-3.5 py-1.5 text-paper shadow-sm transition-transform duration-200 group-hover:scale-[1.02]">
@@ -79,23 +67,33 @@ export function SiteHeader({ productName }: { productName: string }) {
           <span className="sr-only">{open ? "Close" : "Menu"}</span>
           <div className="flex w-4 flex-col gap-[5px]">
             <span
-              className={["h-[1.5px] w-full bg-ink transition-transform duration-300", open ? "translate-y-[6.5px] rotate-45" : ""].join(" ")}
+              className={[
+                "h-[1.5px] w-full bg-ink transition-transform duration-300",
+                open ? "translate-y-[6.5px] rotate-45" : "",
+              ].join(" ")}
             />
             <span
-              className={["h-[1.5px] w-full bg-ink transition-opacity duration-200", open ? "opacity-0" : ""].join(" ")}
+              className={[
+                "h-[1.5px] w-full bg-ink transition-opacity duration-200",
+                open ? "opacity-0" : "",
+              ].join(" ")}
             />
             <span
-              className={["h-[1.5px] w-full bg-ink transition-transform duration-300", open ? "-translate-y-[6.5px] -rotate-45" : ""].join(" ")}
+              className={[
+                "h-[1.5px] w-full bg-ink transition-transform duration-300",
+                open ? "-translate-y-[6.5px] -rotate-45" : "",
+              ].join(" ")}
             />
           </div>
         </button>
       </div>
 
-      {/* Mobile menu */}
       <div
         className={[
-          "fixed inset-0 z-40 bg-paper/95 backdrop-blur-md transition-opacity duration-300 md:hidden",
-          open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0",
+          "fixed inset-0 z-40 bg-paper/95 transition-opacity duration-300 md:hidden",
+          open
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0",
         ].join(" ")}
         aria-hidden={!open}
       >

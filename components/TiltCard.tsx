@@ -9,13 +9,12 @@ import {
 } from "react";
 
 /**
- * Light 3D tilt following the cursor. Max tilt is small so the diagram
- * stays readable. No border effects.
+ * 3D tilt following the cursor. Snaps back on leave.
  */
 export function TiltCard({
   children,
   className = "",
-  maxTilt = 6,
+  maxTilt = 8,
 }: {
   children: ReactNode;
   className?: string;
@@ -23,8 +22,9 @@ export function TiltCard({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [style, setStyle] = useState({
-    transform: "perspective(900px) rotateX(0deg) rotateY(0deg)",
+    transform: "perspective(900px) rotateX(0deg) rotateY(0deg) scale(1)",
   });
+  const [active, setActive] = useState(false);
 
   const onMove = useCallback(
     (e: MouseEvent) => {
@@ -35,16 +35,18 @@ export function TiltCard({
       const py = (e.clientY - rect.top) / rect.height;
       const rotY = (px - 0.5) * maxTilt * 2;
       const rotX = (0.5 - py) * maxTilt * 2;
+      setActive(true);
       setStyle({
-        transform: `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg)`,
+        transform: `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.02)`,
       });
     },
     [maxTilt],
   );
 
   const onLeave = useCallback(() => {
+    setActive(false);
     setStyle({
-      transform: "perspective(900px) rotateX(0deg) rotateY(0deg)",
+      transform: "perspective(900px) rotateX(0deg) rotateY(0deg) scale(1)",
     });
   }, []);
 
@@ -56,7 +58,9 @@ export function TiltCard({
       onMouseLeave={onLeave}
       style={{
         ...style,
-        transition: "transform 280ms cubic-bezier(0.22, 1, 0.36, 1)",
+        transition: active
+          ? "transform 80ms linear"
+          : "transform 480ms cubic-bezier(0.34, 1.3, 0.64, 1)",
         transformStyle: "preserve-3d",
         willChange: "transform",
       }}

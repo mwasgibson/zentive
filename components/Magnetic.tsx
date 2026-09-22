@@ -4,18 +4,18 @@ import {
   useRef,
   useState,
   useCallback,
+  useEffect,
   type ReactNode,
   type MouseEvent,
 } from "react";
 
 /**
- * Soft magnetic pull toward the cursor. Range is small so it feels alive
- * without fighting the user. Disabled under prefers-reduced-motion.
+ * Magnetic pull toward the cursor. Snaps back to origin on leave.
  */
 export function Magnetic({
   children,
   className = "",
-  strength = 0.28,
+  strength = 0.55,
 }: {
   children: ReactNode;
   className?: string;
@@ -23,9 +23,11 @@ export function Magnetic({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const reduce =
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const [reduce, setReduce] = useState(false);
+
+  useEffect(() => {
+    setReduce(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }, []);
 
   const onMove = useCallback(
     (e: MouseEvent) => {
@@ -45,6 +47,8 @@ export function Magnetic({
     setOffset({ x: 0, y: 0 });
   }, []);
 
+  const atRest = offset.x === 0 && offset.y === 0;
+
   return (
     <div
       ref={ref}
@@ -52,10 +56,10 @@ export function Magnetic({
       onMouseMove={onMove}
       onMouseLeave={onLeave}
       style={{
-        transform: `translate(${offset.x}px, ${offset.y}px)`,
-        transition: offset.x === 0 && offset.y === 0
-          ? "transform 420ms cubic-bezier(0.22, 1, 0.36, 1)"
-          : "transform 90ms linear",
+        transform: `translate3d(${offset.x}px, ${offset.y}px, 0)`,
+        transition: atRest
+          ? "transform 500ms cubic-bezier(0.34, 1.4, 0.64, 1)"
+          : "transform 70ms linear",
         willChange: "transform",
       }}
     >
