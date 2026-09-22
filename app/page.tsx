@@ -127,31 +127,38 @@ export default async function HomePage() {
             id="security"
             className="border-t border-border bg-ink py-16 text-paper"
           >
-            <div className="absolute inset-0 security-grid" />
+            <div className="security-grid" aria-hidden />
             <div className="section">
               <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-paper sm:text-3xl">
                 {page.security.heading}
               </h2>
               <div className="mt-10 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-                {page.security.bullets.map((bullet) => (
-                  <div
+                {page.security.bullets.map((bullet, i) => (
+                  <Proximity
                     key={bullet.title}
                     className="security-item flex gap-3.5"
+                    style={
+                      {
+                        animationDelay: `${80 + i * 70}ms`,
+                      } as React.CSSProperties
+                    }
                   >
-                    <SecurityIcon
-                      iconKey={bullet.icon}
-                      size={20}
-                      className="mt-0.5 shrink-0 text-wire security-icon"
-                    />
-                    <div>
-                      <h3 className="font-display text-sm font-semibold text-paper">
+                    <span className="security-icon-wrap mt-0.5 shrink-0">
+                      <SecurityIcon
+                        iconKey={bullet.icon}
+                        size={20}
+                        className="text-wire security-icon"
+                      />
+                    </span>
+                    <div className="security-copy">
+                      <h3 className="security-title font-display text-sm font-semibold text-paper">
                         {bullet.title}
                       </h3>
-                      <p className="mt-1 text-sm leading-relaxed text-paper/70">
+                      <p className="security-body mt-1 text-sm leading-relaxed text-paper/70">
                         {bullet.body}
                       </p>
                     </div>
-                  </div>
+                  </Proximity>
                 ))}
               </div>
             </div>
@@ -236,7 +243,7 @@ export default async function HomePage() {
           </section>
         </Reveal>
 
-        {/* ENGINEERING — CTA stays in left column, away from terminal */}
+        {/* ENGINEERING */}
         <Reveal variant="left">
           <section className="border-t border-border bg-surface py-20">
             <div className="section grid gap-12 lg:grid-cols-2 lg:items-center">
@@ -299,7 +306,7 @@ export default async function HomePage() {
             id="use-cases"
             className="border-y border-border bg-ink py-20 text-paper"
           >
-            <div className="absolute inset-0 security-grid" />
+            <div className="security-grid" aria-hidden />
             <div className="section">
               <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-paper sm:text-4xl">
                 {page.use_cases.heading}
@@ -393,7 +400,7 @@ export default async function HomePage() {
                   Straight answers, before you talk to us.
                 </h2>
                 <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
-                  Don't see your question here? Reach us directly at{" "}
+                  Don&apos;t see your question here? Reach us directly at{" "}
                   <a
                     href={`mailto:${siteConfig.contactEmail}`}
                     className="text-ink underline"
@@ -412,7 +419,7 @@ export default async function HomePage() {
           </section>
         </Reveal>
 
-        {/* FINAL CTA — stays inside this section, cannot enter footer */}
+        {/* FINAL CTA */}
         <Reveal>
           <section className="border-t border-border bg-surface py-20">
             <div className="section flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
