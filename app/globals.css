@@ -105,6 +105,7 @@
   user-select: none;
   opacity: 0;
   animation: delivery-bubble-cycle 4.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  filter: blur(1.2px);
 }
 
 .delivery-bubble-text {
@@ -372,7 +373,9 @@
   border-radius: 9999px;
   background: theme("colors.wire.DEFAULT");
   flex-shrink: 0;
-  transition: background 180ms ease, transform 180ms ease;
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
 }
 
 .feature-chip:hover .feature-chip-dot {
