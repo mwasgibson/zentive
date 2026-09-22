@@ -127,7 +127,7 @@ export default async function HomePage() {
             id="security"
             className="border-t border-border bg-ink py-16 text-paper"
           >
-            <div className="security-grid" aria-hidden />
+            <div className="absolute inset-0 security-grid" aria-hidden />
             <div className="section">
               <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-paper sm:text-3xl">
                 {page.security.heading}
@@ -306,7 +306,7 @@ export default async function HomePage() {
             id="use-cases"
             className="border-y border-border bg-ink py-20 text-paper"
           >
-            <div className="security-grid" aria-hidden />
+            <div className="absolute inset-0 security-grid" aria-hidden />
             <div className="section">
               <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-paper sm:text-4xl">
                 {page.use_cases.heading}

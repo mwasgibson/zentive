@@ -105,6 +105,7 @@
   user-select: none;
   opacity: 0;
   animation: delivery-bubble-cycle 4.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  filter: blur(1.2px);
 }
 
 .delivery-bubble-text {
@@ -389,12 +390,11 @@
 }
 
 .feature-panel {
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.92) 0%,
-      rgba(243, 245, 241, 0.98) 100%
-    );
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(243, 245, 241, 0.98) 100%
+  );
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.8) inset,
     0 12px 28px -12px rgba(20, 20, 20, 0.12),
@@ -471,16 +471,8 @@
   z-index: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0.09) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.09) 1px,
-      transparent 1px
-    );
+    linear-gradient(to right, rgba(255, 255, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.09) 1px, transparent 1px);
   background-size: 28px 28px;
   -webkit-mask-image: radial-gradient(
     ellipse 95% 85% at 50% 45%,
@@ -582,7 +574,7 @@
   );
 }
 
-.mouse-spotlight > * {
+.mouse-spotlight > *:not(.absolute) {
   position: relative;
   z-index: 1;
 }
