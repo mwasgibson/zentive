@@ -8,7 +8,7 @@ import { Reveal } from "@/components/Reveal";
 import { DeliveryField } from "@/components/DeliveryField";
 import { QueueBurst } from "@/components/QueueBurst";
 import { TerminalApi } from "@/components/Api";
-import { Magnetic } from "@/components/Magnetic";
+import { Magnetic, MagneticGroup } from "@/components/Magnetic";
 import { MouseSpotlight } from "@/components/MouseSpotlight";
 import { TiltCard } from "@/components/TiltCard";
 import { HeroMotion } from "@/components/HeroMotion";
@@ -47,8 +47,8 @@ export default async function HomePage() {
       />
       <SiteHeader productName={siteConfig.productName} />
       <main id="top">
-        {/* HERO — diagram gets more column weight, stays inside card */}
-        <section className="section relative overflow-hidden pb-20 pt-16 sm:pt-24">
+        {/* HERO — no overflow-hidden so buttons can float over text */}
+        <section className="section relative pb-20 pt-16 sm:pt-24">
           <DeliveryField />
           <div className="grid items-center gap-10 lg:grid-cols-[0.9fr_1.35fr] lg:gap-12">
             <div>
@@ -69,18 +69,18 @@ export default async function HomePage() {
                 </p>
               </HeroMotion>
               <HeroMotion delay={220}>
-                <div className="mt-8 flex flex-wrap gap-4">
-                  <Magnetic strength={0.6}>
+                <MagneticGroup className="mt-8 flex flex-wrap gap-4">
+                  <Magnetic>
                     <a href="#contact" className="btn-primary">
                       Request early access
                     </a>
                   </Magnetic>
-                  <Magnetic strength={0.5}>
+                  <Magnetic>
                     <a href="#platform" className="btn-secondary">
                       {page.hero.secondary_cta_label}
                     </a>
                   </Magnetic>
-                </div>
+                </MagneticGroup>
               </HeroMotion>
               <HeroMotion delay={320}>
                 <dl className="mt-12 grid grid-cols-3 gap-6 border-t border-border pt-6 text-sm">
@@ -158,7 +158,7 @@ export default async function HomePage() {
           </MouseSpotlight>
         </Reveal>
 
-        {/* GLOSSARY — tilt cards */}
+        {/* GLOSSARY */}
         <Reveal variant="right">
           <section className="border-t border-border bg-surface py-16">
             <div className="section">
@@ -255,7 +255,7 @@ export default async function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <Magnetic strength={0.55} className="mt-8 inline-block">
+                <Magnetic className="mt-8">
                   <a
                     href={`mailto:${siteConfig.contactEmail}`}
                     className="btn-secondary"
@@ -424,7 +424,7 @@ export default async function HomePage() {
                   {page.final_cta.body}
                 </p>
               </div>
-              <Magnetic strength={0.6}>
+              <Magnetic>
                 <a
                   href={`mailto:${siteConfig.contactEmail}`}
                   className="btn-primary group shrink-0"
