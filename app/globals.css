@@ -104,7 +104,6 @@
   pointer-events: none;
   user-select: none;
   opacity: 0;
-  filter: blur(1.2px);
   animation: delivery-bubble-cycle 4.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
@@ -121,7 +120,6 @@
   position: relative;
 }
 
-/* Tail via ::after */
 .delivery-bubble-text::after {
   content: "";
   position: absolute;
@@ -130,7 +128,6 @@
   border-style: solid;
 }
 
-/* A — solid ink, left tail */
 .bubble-a .delivery-bubble-text {
   background: #141414;
   color: #f3f5f1;
@@ -143,7 +140,6 @@
   border-color: #141414 transparent transparent transparent;
 }
 
-/* B — paper surface, right tail */
 .bubble-b .delivery-bubble-text {
   background: #fff;
   color: #141414;
@@ -159,7 +155,6 @@
   filter: drop-shadow(0 1px 0 rgba(20, 20, 20, 0.08));
 }
 
-/* C — signal tint, left tail */
 .bubble-c .delivery-bubble-text {
   background: rgba(226, 113, 29, 0.16);
   color: #c45f12;
@@ -173,7 +168,6 @@
   border-color: rgba(226, 113, 29, 0.28) transparent transparent transparent;
 }
 
-/* D — wire/teal tint, right tail */
 .bubble-d .delivery-bubble-text {
   background: rgba(20, 112, 111, 0.14);
   color: #14706f;
@@ -187,7 +181,6 @@
   border-color: rgba(20, 112, 111, 0.28) transparent transparent transparent;
 }
 
-/* E — outline pill, top-left tail */
 .bubble-e .delivery-bubble-text {
   background: transparent;
   color: #141414;
@@ -221,6 +214,176 @@
   100% {
     opacity: 0;
     transform: translateY(-6px) scale(0.96);
+  }
+}
+
+/* =========================================================
+   PLATFORM — per-icon hover animations + feature chips
+   ========================================================= */
+
+.platform-tab-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 200ms ease;
+}
+
+.platform-tab-icon svg {
+  display: block;
+}
+
+/* Message — soft “ping” / send pulse on hover */
+.platform-tab:hover .icon-msg svg {
+  animation: icon-msg-pulse 700ms ease-in-out;
+}
+@keyframes icon-msg-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.12);
+  }
+  55% {
+    transform: scale(0.96);
+  }
+  75% {
+    transform: scale(1.06);
+  }
+}
+
+/* Shield — tighten / “lock in” */
+.platform-tab:hover .icon-shield svg {
+  animation: icon-shield-lock 650ms cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+@keyframes icon-shield-lock {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+  40% {
+    transform: scale(1.1) translateY(-1px);
+  }
+  70% {
+    transform: scale(0.94) translateY(1px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Wallet — open / settle */
+.platform-tab:hover .icon-wallet svg {
+  animation: icon-wallet-open 700ms ease-in-out;
+}
+@keyframes icon-wallet-open {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  30% {
+    transform: rotate(-8deg) translateY(-1px);
+  }
+  60% {
+    transform: rotate(4deg) translateY(0);
+  }
+}
+
+/* Chart — bars grow feel via vertical stretch */
+.platform-tab:hover .icon-chart svg {
+  animation: icon-chart-grow 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: bottom center;
+}
+@keyframes icon-chart-grow {
+  0% {
+    transform: scaleY(0.75);
+  }
+  50% {
+    transform: scaleY(1.12);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+/* Code — bracket twitch */
+.platform-tab:hover .icon-code svg {
+  animation: icon-code-tick 550ms ease-in-out;
+}
+@keyframes icon-code-tick {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  50% {
+    transform: translateX(2px);
+  }
+  75% {
+    transform: translateX(-1px);
+  }
+}
+
+/* Refresh — full spin on hover */
+.platform-tab:hover .icon-refresh svg {
+  animation: icon-refresh-spin 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes icon-refresh-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Feature chips */
+.feature-chip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.75rem;
+  border: 1px solid theme("colors.border");
+  background: rgba(255, 255, 255, 0.55);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: theme("colors.muted");
+  opacity: 0;
+  transform: translateY(10px);
+  animation: feature-chip-in 480ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transition:
+    color 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease;
+}
+
+.feature-chip:hover {
+  color: theme("colors.ink");
+  background: #fff;
+  border-color: rgba(20, 20, 20, 0.14);
+}
+
+.feature-chip-dot {
+  margin-top: 0.4rem;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 9999px;
+  background: theme("colors.wire.DEFAULT");
+  flex-shrink: 0;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.feature-chip:hover .feature-chip-dot {
+  background: theme("colors.signal.dark");
+  transform: scale(1.25);
+}
+
+@keyframes feature-chip-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -545,6 +708,16 @@ tr:hover .api-method {
     animation: none !important;
     opacity: 0.85 !important;
     transform: none !important;
+  }
+
+  .feature-chip {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .platform-tab:hover .platform-tab-icon svg {
+    animation: none !important;
   }
 
   .security-icon {
