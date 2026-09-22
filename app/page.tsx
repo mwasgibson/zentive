@@ -13,6 +13,7 @@ import { MouseSpotlight } from "@/components/MouseSpotlight";
 import { TiltCard } from "@/components/TiltCard";
 import { HeroMotion } from "@/components/HeroMotion";
 import { Proximity } from "@/components/Proximity";
+import { HowItWorks } from "@/components/HowItWorks";
 import {
   getSiteConfig,
   getFaqs,
@@ -194,55 +195,11 @@ export default async function HomePage() {
         <Reveal variant="up">
           <section id="how-it-works" className="py-20">
             <div className="section">
-              <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-                {page.how_it_works.heading}
-              </h2>
-              <p className="mt-4 max-w-2xl text-muted">
-                {page.how_it_works.subhead}
-              </p>
-              <div className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-                {page.how_it_works.steps.map((step, i) => (
-                  <Proximity
-                    key={step.n}
-                    className="how-step relative"
-                    style={
-                      {
-                        animationDelay: `${i * 120}ms`,
-                      } as React.CSSProperties
-                    }
-                  >
-                    <span className="font-mono text-sm text-signal-dark">
-                      {step.n}
-                    </span>
-                    <h3 className="mt-2 font-display text-lg font-semibold text-ink">
-                      {step.title}
-                    </h3>
-                    {step.badges && step.badges.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {step.badges.map((b) => (
-                          <span
-                            key={b}
-                            className="rounded-full border border-wire/30 bg-wire-light px-2.5 py-0.5 font-mono text-[11px] text-wire"
-                          >
-                            {b}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    <p className="mt-2 text-sm leading-relaxed text-muted">
-                      {step.body}
-                    </p>
-                    {i < page.how_it_works.steps.length - 1 && (
-                      <span
-                        aria-hidden
-                        className="how-arrow absolute right-[-1rem] top-1 hidden font-mono text-border lg:block"
-                      >
-                        →
-                      </span>
-                    )}
-                  </Proximity>
-                ))}
-              </div>
+              <HowItWorks
+                heading={page.how_it_works.heading}
+                subhead={page.how_it_works.subhead}
+                steps={page.how_it_works.steps}
+              />
             </div>
           </section>
         </Reveal>
@@ -404,7 +361,7 @@ export default async function HomePage() {
                   Straight answers, before you talk to us.
                 </h2>
                 <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
-                  Don't see your question here? Reach us directly at{" "}
+                  Don&apos;t see your question here? Reach us directly at{" "}
                   <a
                     href={`mailto:${siteConfig.contactEmail}`}
                     className="text-ink underline"
