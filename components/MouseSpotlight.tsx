@@ -5,6 +5,7 @@ import {
   useCallback,
   type ReactNode,
   type MouseEvent,
+  type CSSProperties,
 } from "react";
 
 /**
@@ -14,9 +15,11 @@ import {
 export function MouseSpotlight({
   children,
   className = "",
+  id,
 }: {
   children: ReactNode;
   className?: string;
+  id?: string;
 }) {
   const ref = useRef<HTMLElement>(null);
 
@@ -33,13 +36,14 @@ export function MouseSpotlight({
   return (
     <section
       ref={ref as React.RefObject<HTMLElement>}
+      id={id}
       className={`mouse-spotlight ${className}`}
       onMouseMove={onMove}
       style={
         {
           "--spot-x": "50%",
           "--spot-y": "40%",
-        } as React.CSSProperties
+        } as CSSProperties
       }
     >
       {children}

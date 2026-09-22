@@ -57,7 +57,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }}
       />
-      <SiteHeader />
+      <SiteHeader productName={siteConfig.productName} />
       <main>
         <article className="section max-w-2xl py-16">
           <p className="font-mono text-xs text-muted">
@@ -76,13 +76,6 @@ export default async function BlogPostPage({ params }: PageProps) {
             />
           )}
 
-          {/*
-            post.body is sanitized server-side by the CMS (HtmlSanitizer, an
-            allowlist of tags/attributes) before it's ever stored — this
-            render trusts that sanitization rather than re-sanitizing on the
-            client. If the CMS's sanitizer is ever weakened, this becomes a
-            live XSS surface, so treat that file as security-critical.
-          */}
           <div
             className="prose prose-sm sm:prose-base mt-8 max-w-none prose-headings:font-display prose-a:text-signal-dark prose-blockquote:border-wire"
             dangerouslySetInnerHTML={{ __html: post.body }}

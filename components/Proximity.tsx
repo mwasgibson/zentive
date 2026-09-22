@@ -6,18 +6,20 @@ import {
   useCallback,
   type ReactNode,
   type MouseEvent,
+  type CSSProperties,
 } from "react";
 
 /**
- * Brightens / lifts opacity when the cursor is near. No borders, no lift.
- * For glossary cards and how-it-works steps.
+ * Brightens when the cursor is near. No borders, no lift.
  */
 export function Proximity({
   children,
   className = "",
+  style,
 }: {
   children: ReactNode;
   className?: string;
+  style?: CSSProperties;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(false);
@@ -25,7 +27,6 @@ export function Proximity({
   const onEnter = useCallback(() => setActive(true), []);
   const onLeave = useCallback(() => setActive(false), []);
 
-  // Optional: stronger response when closer to center
   const onMove = useCallback((e: MouseEvent) => {
     if (!ref.current) return;
     const rect = ref.current.getBoundingClientRect();
@@ -42,7 +43,12 @@ export function Proximity({
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
       onMouseMove={onMove}
-      style={{ "--prox": active ? 1 : 0.72 } as React.CSSProperties}
+      style={
+        {
+          ...style,
+          "--prox": active ? 1 : 0.72,
+        } as CSSProperties
+      }
     >
       {children}
     </div>
