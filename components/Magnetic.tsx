@@ -19,11 +19,14 @@ type MagneticCtx = {
 
 const MagneticContext = createContext<MagneticCtx | null>(null);
 
-/**
- * Wrap a section so only one Magnetic child is “grabbed” at a time.
- * Active button keeps the move; the other ignores hover until release.
- */
-export function MagneticGroup({ children, className = "" }: { children: ReactNode; className?: string }) {
+/** Only one Magnetic inside the group is active at a time. */
+export function MagneticGroup({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   const [activeId, setActiveId] = useState<string | null>(null);
   return (
     <MagneticContext.Provider value={{ activeId, setActiveId }}>
@@ -33,9 +36,9 @@ export function MagneticGroup({ children, className = "" }: { children: ReactNod
 }
 
 /**
- * Button follows the cursor freely in X and Y while hovered / captured.
- * Snaps back to its original spot on leave. Does not steal from a sibling
- * that already has the cursor.
+ * Layout slot stays put. The inner layer follows the cursor freely in X and Y
+ * (can travel over the rest of the section). Springs home on leave.
+ * Sibling buttons in a MagneticGroup do not steal the grab.
  */
 export function Magnetic({
   children,
@@ -45,7 +48,7 @@ export function Magnetic({
   className?: string;
 }) {
   const id = useId();
-  const ref = useRef<HTMLDivElement>(null);
+  const slotRef = useRef<HTMLDivElement>(null);
   const origin = useRef({ x: 0, y: 0 });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [active, setActive] = useState(false);
@@ -56,9 +59,9 @@ export function Magnetic({
     setReduce(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   }, []);
 
-  const lockOrigin = useCallback(() => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
+  const readOrigin = useCallback(() => {
+    if (!slotRef.current) return;
+    const rect = slotRef.current.getBoundingClientRect();
     origin.current = {
       x: rect.left + rect.width / 2,
       y: rect.top + rect.height / 2,
@@ -68,18 +71,17 @@ export function Magnetic({
   const onEnter = useCallback(
     (e: MouseEvent) => {
       if (reduce) return;
-      // Another button in the group already owns the cursor
       if (group?.activeId && group.activeId !== id) return;
 
       group?.setActiveId(id);
+      readOrigin();
       setActive(true);
-      lockOrigin();
-      // Jump immediately toward cursor so Y/X both respond
-      const ox = origin.current.x;
-      const oy = origin.current.y;
-      setOffset({ x: e.clientX - ox, y: e.clientY - oy });
+      setOffset({
+        x: e.clientX - origin.current.x,
+        y: e.clientY - origin.current.y,
+      });
     },
-    [reduce, group, id, lockOrigin],
+    [reduce, group, id, readOrigin],
   );
 
   const onMove = useCallback(
@@ -101,7 +103,6 @@ export function Magnetic({
     if (group?.activeId === id) group.setActiveId(null);
   }, [group, id]);
 
-  // If group clears us externally, snap home
   useEffect(() => {
     if (group && group.activeId !== id && active) {
       setActive(false);
@@ -113,23 +114,32 @@ export function Magnetic({
 
   return (
     <div
-      ref={ref}
+      ref={slotRef}
       className={className}
-      onMouseEnter={onEnter}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
       style={{
-        transform: `translate3d(${offset.x}px, ${offset.y}px, 0)`,
-        transition: active
-          ? "transform 40ms linear"
-          : "transform 520ms cubic-bezier(0.34, 1.45, 0.64, 1)",
-        willChange: "transform",
         position: "relative",
-        zIndex: active ? 30 : blocked ? 1 : 10,
-        pointerEvents: blocked ? "none" : "auto",
+        display: "inline-flex",
+        // Keep layout space even while the visible button floats away
+        verticalAlign: "top",
       }}
     >
-      {children}
+      <div
+        onMouseEnter={onEnter}
+        onMouseMove={onMove}
+        onMouseLeave={onLeave}
+        style={{
+          transform: `translate3d(${offset.x}px, ${offset.y}px, 0)`,
+          transition: active
+            ? "transform 30ms linear"
+            : "transform 520ms cubic-bezier(0.34, 1.45, 0.64, 1)",
+          willChange: "transform",
+          zIndex: active ? 40 : blocked ? 1 : 10,
+          pointerEvents: blocked ? "none" : "auto",
+          position: "relative",
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 }
