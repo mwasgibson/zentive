@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
 import { getSiteConfig } from "@/lib/cms";
 import "./globals.css";
+import "./styles/space-accents.css";
 
 const inter = Inter({
   subsets: ["latin"],
