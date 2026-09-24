@@ -364,7 +364,7 @@
   }
 }
 
-/* --- CTA void: full section, stars/pull media, right → button --- */
+/* --- CTA void: right edge → up to the button only (not full section) --- */
 .cta-section {
   position: relative;
   overflow: hidden;
@@ -384,26 +384,27 @@
   .cta-void {
     display: block;
     position: absolute;
-    /* Full section fill */
-    inset: 0;
+    /* From the right edge leftward only as far as the button cluster */
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: min(42%, 22rem);
     pointer-events: none;
     z-index: 0;
-    /* Strong on the right, dissolves toward text/button on the left */
+    /* Soft left edge so it meets the button area cleanly */
     -webkit-mask-image: linear-gradient(
       to left,
       #000 0%,
-      #000 28%,
-      rgba(0, 0, 0, 0.65) 48%,
-      rgba(0, 0, 0, 0.25) 68%,
-      transparent 92%
+      #000 55%,
+      rgba(0, 0, 0, 0.5) 80%,
+      transparent 100%
     );
     mask-image: linear-gradient(
       to left,
       #000 0%,
-      #000 28%,
-      rgba(0, 0, 0, 0.65) 48%,
-      rgba(0, 0, 0, 0.25) 68%,
-      transparent 92%
+      #000 55%,
+      rgba(0, 0, 0, 0.5) 80%,
+      transparent 100%
     );
   }
 
@@ -412,8 +413,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 70% center;
-    opacity: 0.85;
+    object-position: center;
   }
 }
 
