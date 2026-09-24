@@ -19,12 +19,20 @@
     top: 0;
     bottom: 0;
     right: 0;
+    left: min(100%, 64rem);
     width: 12rem;
     pointer-events: none;
     background: linear-gradient(
       to right,
       rgba(20, 20, 20, 0.06),
       transparent 70%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      #000 20%,
+      #000 80%,
+      transparent
     );
   }
 }
@@ -43,6 +51,7 @@
     width: 2.5rem;
     pointer-events: none;
     background: linear-gradient(to right, rgba(20, 20, 20, 0.1), transparent);
+    border-radius: 0 1rem 1rem 0;
     filter: blur(8px);
   }
 }
@@ -73,7 +82,9 @@
       rgba(20, 112, 111, 0.07) calc(1.55rem + 1px)
     ),
     linear-gradient(165deg, #fbf9f4 0%, #f0ebe3 100%);
-  background-size: 100% 1.6rem, 100% 100%;
+  background-size:
+    100% 1.6rem,
+    100% 100%;
   border-radius: 0.15rem 0.15rem 0.5rem 0.5rem;
   padding: 1.1rem 1.05rem 1rem;
   box-shadow:
