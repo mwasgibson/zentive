@@ -113,9 +113,31 @@ export default async function HomePage() {
         <Reveal variant="up">
           <section
             id="platform"
-            className="border-t border-border bg-surface py-20"
+            className="border-t border-border bg-surface py-20 relative"
           >
-            <div className="section platform-stage">
+            {/* Background Image tucking behind the right side */}
+            <div
+              className="hidden lg:block absolute right-0 top-0 bottom-0 w-[55%] pointer-events-none z-0 overflow-hidden"
+              style={{
+                WebkitMaskImage:
+                  "linear-gradient(to left, #000 0%, #000 55%, rgba(0, 0, 0, 0.5) 80%, transparent 100%)",
+                maskImage:
+                  "linear-gradient(to left, #000 0%, #000 55%, rgba(0, 0, 0, 0.5) 80%, transparent 100%)",
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/platform-mobile.png"
+                alt=""
+                className="w-full h-full object-cover opacity-90"
+                style={{
+                  objectPosition: "center",
+                  transform: "scale(1.5) translateX(15%)",
+                }}
+              />
+            </div>
+
+            <div className="section platform-stage relative z-10">
               <span className="platform-stage__falloff" aria-hidden />
               <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                 {page.features.heading}

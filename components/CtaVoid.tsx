@@ -13,7 +13,7 @@ export function CtaVoid() {
         className="cta-void__media"
         src="/cta-void.gif"
         alt=""
-        decoding="async"
+        style={{ transform: "translateZ(0)" }}
       />
     </div>
   );

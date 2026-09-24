@@ -85,7 +85,9 @@
       rgba(20, 112, 111, 0.08) calc(1.7rem + 1px)
     ),
     linear-gradient(165deg, #fbf9f4 0%, #f0ebe3 100%);
-  background-size: 100% 1.75rem, 100% 100%;
+  background-size:
+    100% 1.75rem,
+    100% 100%;
   border-radius: 0.2rem 0.2rem 0.6rem 0.6rem;
   padding: 1.4rem 1.35rem 1.25rem;
   box-shadow:
@@ -388,7 +390,7 @@
     right: 0;
     top: 0;
     bottom: 0;
-    width: min(42%, 22rem);
+    width: 55%;
     pointer-events: none;
     z-index: 0;
     /* Soft left edge so it meets the button area cleanly */
