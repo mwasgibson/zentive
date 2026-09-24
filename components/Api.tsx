@@ -14,7 +14,32 @@ type LogLine = {
   text: string;
 };
 
-const IDLE_DEMO_MS = 4800;
+/** Wait before starting (or restarting) the idle demo. */
+const IDLE_START_MS = 4200;
+/** Gap between each of the three demo commands. */
+const DEMO_STEP_MS = 1400;
+/** Pause after clear before the next cycle. */
+const DEMO_LOOP_MS = 2800;
+
+function shortPath(path: string) {
+  // Keep the useful tail: /v1/sms/send → /sms/send
+  return path.replace(/^\/v1/, "") || path;
+}
+
+function shortDesc(desc: string) {
+  if (desc.length <= 28) return desc;
+  return desc.slice(0, 26).trimEnd() + "…";
+}
+
+function pickThree<T>(items: T[]): T[] {
+  if (items.length === 0) return [];
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, Math.min(3, copy.length));
+}
 
 export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
   const [input, setInput] = useState("");
@@ -24,36 +49,59 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(0);
+  const focusedRef = useRef(false);
   const hasInteractedRef = useRef(false);
-  const demoRanRef = useRef(false);
   const endpointsRef = useRef(endpoints);
   endpointsRef.current = endpoints;
+  const timersRef = useRef<number[]>([]);
+  const cycleActiveRef = useRef(false);
+
+  const clearTimers = useCallback(() => {
+    timersRef.current.forEach((t) => window.clearTimeout(t));
+    timersRef.current = [];
+    cycleActiveRef.current = false;
+  }, []);
 
   const markInteracted = useCallback(() => {
     hasInteractedRef.current = true;
-  }, []);
+    clearTimers();
+  }, [clearTimers]);
 
-  useEffect(() => {
-    // Initial welcome + list endpoints once
+  const pushLog = useCallback(
+    (type: LogLine["type"], text: string) => {
+      setLogs((prev) => [
+        ...prev,
+        { id: idRef.current++, type, text },
+      ]);
+    },
+    [],
+  );
+
+  const seedWelcome = useCallback(() => {
+    const list = endpointsRef.current;
     const initial: LogLine[] = [
       {
         id: idRef.current++,
         type: "info",
-        text: "terminal — type 'help' for available commands",
+        text: "terminal — type 'help'",
       },
       {
         id: idRef.current++,
         type: "muted",
-        text: "registered endpoints:",
+        text: "endpoints:",
       },
-      ...endpoints.map((e) => ({
+      ...list.map((e) => ({
         id: idRef.current++,
         type: "success" as const,
-        text: `${e.method.padEnd(6)} ${e.path} — ${e.desc}`,
+        text: `${e.method.padEnd(5)} ${shortPath(e.path)} — ${shortDesc(e.desc)}`,
       })),
     ];
     setLogs(initial);
-  }, [endpoints]);
+  }, []);
+
+  useEffect(() => {
+    seedWelcome();
+  }, [endpoints, seedWelcome]);
 
   useEffect(() => {
     containerRef.current?.scrollTo({
@@ -62,115 +110,136 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
     });
   }, [logs]);
 
-  const runCommand = useCallback((cmdRaw: string) => {
-    const cmd = cmdRaw.trim();
-    if (!cmd) return;
+  const runCommand = useCallback(
+    (cmdRaw: string) => {
+      const cmd = cmdRaw.trim();
+      if (!cmd) return;
 
-    setLogs((prev) => [
-      ...prev,
-      { id: idRef.current++, type: "info", text: `user@usersmac ~ % ${cmd}` },
-    ]);
+      pushLog("info", `user@usersmac ~ % ${cmd}`);
 
-    const [command, ...args] = cmd.split(/\s+/);
-    const lower = command.toLowerCase();
-    const list = endpointsRef.current;
-
-    const response: {
-      type: "info" | "error" | "success" | "muted";
-      text: string;
-    }[] = [];
-
-    switch (lower) {
-      case "help":
-        response.push({
-          type: "info",
-          text: "available commands: help, endpoints, curl <path>, clear, echo <text>",
-        });
-        break;
-
-      case "endpoints":
-        response.push({
-          type: "muted",
-          text: "registered endpoints:",
-        });
-        list.forEach((e) => {
-          response.push({
-            type: "success",
-            text: `${e.method.padEnd(6)} ${e.path} — ${e.desc}`,
-          });
-        });
-        break;
-
-      case "curl": {
-        const path = args[0];
-        if (!path) {
-          response.push({
-            type: "error",
-            text: "usage: curl <path>  (e.g. curl /v1/send)",
-          });
-        } else {
-          const match = list.find((e) => e.path === path);
-          if (!match) {
-            response.push({
-              type: "error",
-              text: `no endpoint found for path: ${path}`,
-            });
-          } else {
-            response.push({
-              type: "success",
-              text:
-                `curl -X ${match.method} "https://api.sh${match.path}"\n` +
-                `# ${match.desc}`,
-            });
-          }
-        }
-        break;
-      }
-
-      case "clear":
-        setLogs([]);
-        return;
-
-      case "echo":
-        response.push({
-          type: "info",
-          text: args.join(" ") || "",
-        });
-        break;
-
-      default:
-        response.push({
-          type: "error",
-          text: `unknown command: ${command}. type 'help' for options.`,
-        });
-    }
-
-    setLogs((prev) => [
-      ...prev,
-      ...response.map((r) => ({ id: idRef.current++, ...r })),
-    ]);
-  }, []);
-
-  // One-shot idle demo: run a curl if the user never touches the terminal
-  useEffect(() => {
-    if (demoRanRef.current) return;
-
-    const timer = window.setTimeout(() => {
-      if (hasInteractedRef.current || demoRanRef.current) return;
-      demoRanRef.current = true;
-
+      const [command, ...args] = cmd.split(/\s+/);
+      const lower = command.toLowerCase();
       const list = endpointsRef.current;
-      const preferred =
-        list.find((e) => e.path.includes("/sms/send") && !e.path.includes("bulk")) ??
-        list.find((e) => e.method === "POST") ??
-        list[0];
 
-      if (!preferred) return;
-      runCommand(`curl ${preferred.path}`);
-    }, IDLE_DEMO_MS);
+      switch (lower) {
+        case "help":
+          pushLog(
+            "info",
+            "commands: help, endpoints, curl <path>, clear, echo <text>",
+          );
+          break;
 
-    return () => window.clearTimeout(timer);
-  }, [runCommand]);
+        case "endpoints":
+          pushLog("muted", "endpoints:");
+          list.forEach((e) => {
+            pushLog(
+              "success",
+              `${e.method.padEnd(5)} ${shortPath(e.path)} — ${shortDesc(e.desc)}`,
+            );
+          });
+          break;
+
+        case "curl": {
+          const pathArg = args[0];
+          if (!pathArg) {
+            pushLog("error", "usage: curl <path>");
+            break;
+          }
+          // Accept short or full path
+          const match = list.find(
+            (e) =>
+              e.path === pathArg ||
+              shortPath(e.path) === pathArg ||
+              e.path === `/v1${pathArg.startsWith("/") ? pathArg : `/${pathArg}`}`,
+          );
+          if (!match) {
+            pushLog("error", `no endpoint: ${pathArg}`);
+          } else {
+            pushLog(
+              "success",
+              `curl -X ${match.method} "https://api.sh${match.path}"`,
+            );
+            pushLog("muted", `# ${shortDesc(match.desc)}`);
+          }
+          break;
+        }
+
+        case "clear":
+          setLogs([]);
+          return;
+
+        case "echo":
+          pushLog("info", args.join(" ") || "");
+          break;
+
+        default:
+          pushLog(
+            "error",
+            `unknown: ${command}. type 'help'`,
+          );
+      }
+    },
+    [pushLog],
+  );
+
+  const scheduleIdleCycle = useCallback(() => {
+    clearTimers();
+    if (focusedRef.current || hasInteractedRef.current) return;
+
+    const start = window.setTimeout(() => {
+      if (focusedRef.current || hasInteractedRef.current) return;
+      cycleActiveRef.current = true;
+
+      const picks = pickThree(endpointsRef.current);
+      if (picks.length === 0) return;
+
+      picks.forEach((ep, i) => {
+        const t = window.setTimeout(() => {
+          if (focusedRef.current || hasInteractedRef.current) return;
+          runCommand(`curl ${shortPath(ep.path)}`);
+
+          // After last command: clear, reseed welcome, loop
+          if (i === picks.length - 1) {
+            const clearT = window.setTimeout(() => {
+              if (focusedRef.current || hasInteractedRef.current) return;
+              setLogs([]);
+              const reseed = window.setTimeout(() => {
+                if (focusedRef.current || hasInteractedRef.current) return;
+                seedWelcome();
+                // Reset interaction only for the idle loop so it can continue;
+                // focusedRef still gates when the user is in the terminal.
+                hasInteractedRef.current = false;
+                scheduleIdleCycle();
+              }, 400);
+              timersRef.current.push(reseed);
+            }, DEMO_LOOP_MS);
+            timersRef.current.push(clearT);
+          }
+        }, DEMO_STEP_MS * (i + 1));
+        timersRef.current.push(t);
+      });
+    }, IDLE_START_MS);
+
+    timersRef.current.push(start);
+  }, [clearTimers, runCommand, seedWelcome]);
+
+  // Start idle cycle on mount; restart when focus leaves
+  useEffect(() => {
+    scheduleIdleCycle();
+    return () => clearTimers();
+  }, [scheduleIdleCycle, clearTimers]);
+
+  const onFocus = () => {
+    focusedRef.current = true;
+    markInteracted();
+  };
+
+  const onBlur = () => {
+    focusedRef.current = false;
+    // Allow demo to resume after blur + idle
+    hasInteractedRef.current = false;
+    scheduleIdleCycle();
+  };
 
   const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
     markInteracted();
@@ -230,7 +299,6 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
       >
         <div className="absolute inset-0 api-scanlines" />
         <div className="relative px-4 py-3">
-          {/* Logs (including static endpoint list + command output) */}
           {logs.map((log) => (
             <div
               key={log.id}
@@ -249,7 +317,6 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
             </div>
           ))}
 
-          {/* Prompt + input */}
           <div className="mt-2 flex items-center gap-2 font-mono text-[12.5px]">
             <span className="text-wire">user@usersmac ~ %</span>
             <input
@@ -259,10 +326,11 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
                 markInteracted();
                 setInput(e.target.value);
               }}
-              onFocus={markInteracted}
+              onFocus={onFocus}
+              onBlur={onBlur}
               onKeyDown={onKeyDown}
               className="flex-1 bg-transparent text-paper outline-none placeholder:text-paper/30"
-              placeholder="type 'help' or 'curl /v1/send'…"
+              placeholder="type 'help' or 'curl /sms/send'…"
               spellCheck={false}
               autoComplete="off"
             />
