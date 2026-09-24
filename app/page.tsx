@@ -3,6 +3,7 @@ import { PlatformTabs } from "@/components/PlatformTabs";
 import { FaqItem } from "@/components/FaqItem";
 import { FaqEnvelope } from "@/components/FaqEnvelope";
 import { CtaVoid } from "@/components/CtaVoid";
+import { CtaAccessButton } from "@/components/CtaAccessButton";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SecurityIcon } from "@/components/Securityicon";
@@ -421,22 +422,10 @@ export default async function HomePage() {
                   {page.final_cta.body}
                 </p>
               </div>
-              <div className="cta-resist relative z-[1]">
-                <Magnetic bounds="section">
-                  <a
-                    href={`mailto:${siteConfig.contactEmail}`}
-                    className="btn-primary group shrink-0"
-                  >
-                    <span>{page.final_cta.cta_label}</span>
-                    <span
-                      aria-hidden
-                      className="inline-block transition-transform duration-200 group-hover:translate-x-0.5"
-                    >
-                      →
-                    </span>
-                  </a>
-                </Magnetic>
-              </div>
+              <CtaAccessButton
+                href={`mailto:${siteConfig.contactEmail}`}
+                label={page.final_cta.cta_label}
+              />
             </div>
           </section>
         </Reveal>
