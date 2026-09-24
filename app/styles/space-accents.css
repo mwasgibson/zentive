@@ -1,0 +1,406 @@
+/* =========================================================
+   SPACE ACCENTS — terminal atmosphere, platform falloff,
+   FAQ envelope, CTA void pull (no extra rails/signals)
+   ========================================================= */
+
+/* --- Terminal: noise + vignette void ---
+   Sits under scanlines; visible especially after clear */
+.terminal-atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.terminal-atmosphere__vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 80% 70% at 50% 40%,
+      transparent 0%,
+      rgba(0, 0, 0, 0.35) 55%,
+      rgba(0, 0, 0, 0.72) 100%
+    );
+  animation: terminal-breathe 7s ease-in-out infinite;
+}
+
+.terminal-atmosphere__noise {
+  position: absolute;
+  inset: -20%;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  animation: terminal-noise-drift 12s linear infinite;
+  mix-blend-mode: overlay;
+}
+
+@keyframes terminal-breathe {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes terminal-noise-drift {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(-4%, 3%);
+  }
+}
+
+/* --- Platform: light falloff off the panel + wordmark ---
+*/
+.platform-stage {
+  position: relative;
+}
+
+.platform-stage__falloff {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .platform-stage__falloff {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: min(100%, 64rem);
+    width: 12rem;
+    pointer-events: none;
+    background: linear-gradient(
+      to right,
+      rgba(20, 20, 20, 0.06),
+      transparent 70%
+    );
+    mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+  }
+
+  .platform-stage__wordmark {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: theme("fontFamily.display", ui-sans-serif);
+    font-size: clamp(4rem, 11vw, 8.5rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: theme("colors.ink");
+    opacity: 0.045;
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: translateY(-50%) rotate(180deg);
+  }
+}
+
+.platform-stage__wordmark {
+  display: none;
+}
+
+/* Panel edge shadow — light falls off to the right */
+.platform-panel-falloff {
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  .platform-panel-falloff::after {
+    content: "";
+    position: absolute;
+    top: 8%;
+    bottom: 8%;
+    right: -1.5rem;
+    width: 2.5rem;
+    pointer-events: none;
+    background: linear-gradient(
+      to right,
+      rgba(20, 20, 20, 0.1),
+      transparent
+    );
+    border-radius: 0 1rem 1rem 0;
+    filter: blur(8px);
+  }
+}
+
+/* --- FAQ envelope ---
+*/
+.faq-envelope {
+  position: relative;
+  margin-top: 2rem;
+  max-width: 22rem;
+  transform-origin: 50% 80%;
+  transition:
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 600ms ease;
+}
+
+.faq-envelope.is-flying {
+  transform: translateY(-120%) translateX(18%) rotate(-12deg) scale(0.85);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.faq-envelope__body {
+  position: relative;
+  border: 1px solid theme("colors.border");
+  background: linear-gradient(160deg, #f7f4ee 0%, #ebe7df 100%);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.15rem 1.1rem;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 14px 28px -16px rgba(20, 20, 20, 0.18),
+    0 4px 10px -4px rgba(20, 20, 20, 0.06);
+}
+
+/* Flap */
+.faq-envelope__flap {
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  top: -0.65rem;
+  height: 1.3rem;
+  background: linear-gradient(180deg, #e8e4dc, #ddd8ce);
+  border: 1px solid theme("colors.border");
+  border-bottom: none;
+  border-radius: 0.5rem 0.5rem 0 0;
+  clip-path: polygon(0 100%, 50% 0, 100% 100%);
+  opacity: 0.95;
+}
+
+.faq-envelope__label {
+  font-family: theme("fontFamily.mono");
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: theme("colors.wire.DEFAULT", #6b7280);
+  margin-bottom: 0.65rem;
+}
+
+.faq-envelope__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.faq-envelope__input {
+  width: 100%;
+  min-height: 4.5rem;
+  resize: none;
+  border: 1px solid rgba(20, 20, 20, 0.1);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.75);
+  padding: 0.65rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: theme("colors.ink");
+  outline: none;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.faq-envelope__input:focus {
+  border-color: rgba(226, 113, 29, 0.45);
+  box-shadow: 0 0 0 3px rgba(226, 113, 29, 0.12);
+}
+
+.faq-envelope__input::placeholder {
+  color: theme("colors.muted");
+}
+
+.faq-envelope__send {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(20, 20, 20, 0.14);
+  background: theme("colors.ink");
+  color: theme("colors.paper", #f8f6f1);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  transition: background 180ms ease, transform 120ms ease;
+}
+
+.faq-envelope__send:hover {
+  background: theme("colors.signal.dark", #c45f12);
+}
+
+.faq-envelope__send:active {
+  transform: scale(0.98);
+}
+
+.faq-envelope__send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.faq-envelope__hint {
+  margin-top: 0.5rem;
+  font-size: 0.7rem;
+  color: theme("colors.muted");
+}
+
+/* --- CTA void: pulls toward the button; button holds ---
+*/
+.cta-row {
+  position: relative;
+  width: 100%;
+}
+
+.cta-void {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .cta-void {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: min(28vw, 18rem);
+    height: 11rem;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .cta-void__core {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 70% 50%,
+      rgba(20, 20, 20, 0.14) 0%,
+      rgba(20, 20, 20, 0.05) 42%,
+      transparent 68%
+    );
+    animation: cta-void-pulse 4.5s ease-in-out infinite;
+  }
+
+  .cta-void__rim {
+    position: absolute;
+    inset: 18% 8%;
+    border-radius: 50%;
+    border: 1px solid rgba(20, 20, 20, 0.08);
+    animation: cta-void-rim 5.5s ease-in-out infinite;
+  }
+
+  .cta-void__speck {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 9999px;
+    background: rgba(20, 20, 20, 0.25);
+    animation: cta-void-suck 3.2s ease-in infinite;
+  }
+
+  .cta-void__speck:nth-child(3) {
+    top: 28%;
+    right: 22%;
+    animation-delay: 0s;
+  }
+  .cta-void__speck:nth-child(4) {
+    top: 55%;
+    right: 40%;
+    animation-delay: 0.7s;
+  }
+  .cta-void__speck:nth-child(5) {
+    top: 40%;
+    right: 12%;
+    animation-delay: 1.4s;
+  }
+  .cta-void__speck:nth-child(6) {
+    top: 62%;
+    right: 28%;
+    animation-delay: 2.1s;
+  }
+}
+
+@keyframes cta-void-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+
+@keyframes cta-void-rim {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(0.92);
+    opacity: 0.85;
+  }
+}
+
+@keyframes cta-void-suck {
+  0% {
+    opacity: 0;
+    transform: translate(12px, 0) scale(0.6);
+  }
+  30% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-36px, 4px) scale(0.2);
+  }
+}
+
+/* Button resists the pull — micro tension, stays put */
+.cta-resist {
+  position: relative;
+  z-index: 1;
+  animation: cta-resist 3.8s ease-in-out infinite;
+}
+
+@keyframes cta-resist {
+  0%,
+  100% {
+    transform: translateX(0);
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  40% {
+    transform: translateX(3px);
+    filter: drop-shadow(6px 0 8px rgba(20, 20, 20, 0.08));
+  }
+  55% {
+    transform: translateX(0);
+    filter: drop-shadow(0 0 0 transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal-atmosphere__vignette,
+  .terminal-atmosphere__noise,
+  .cta-void__core,
+  .cta-void__rim,
+  .cta-void__speck,
+  .cta-resist,
+  .faq-envelope {
+    animation: none !important;
+  }
+
+  .faq-envelope.is-flying {
+    opacity: 0;
+    transform: none;
+  }
+}
