@@ -5,8 +5,8 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 type Phase = "letter" | "fold" | "envelope" | "plane" | "fly" | "gone";
 
 /**
- * Letter form (name, email, question) → folds → envelope → plane → flies.
- * Fly-off opens mailto with the filled fields so the message can actually be sent.
+ * Letter (name, email, question) → fold → envelope → plane → fly.
+ * Mailto fires immediately on submit so the mail client always opens.
  */
 export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
   const [name, setName] = useState("");
@@ -16,36 +16,22 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const timersRef = useRef<number[]>([]);
   const busyRef = useRef(false);
-  const pendingMailRef = useRef<{ name: string; email: string; question: string } | null>(null);
 
   function clearTimers() {
     timersRef.current.forEach((id) => window.clearTimeout(id));
     timersRef.current = [];
   }
 
-  function runSequence(thenMail: boolean) {
+  function runVisualSequence() {
     if (busyRef.current) return;
     busyRef.current = true;
     clearTimers();
 
     setPhase("fold");
-    timersRef.current.push(window.setTimeout(() => setPhase("envelope"), 420));
-    timersRef.current.push(window.setTimeout(() => setPhase("plane"), 900));
-    timersRef.current.push(window.setTimeout(() => setPhase("fly"), 1280));
-    timersRef.current.push(
-      window.setTimeout(() => {
-        setPhase("gone");
-        if (thenMail && pendingMailRef.current) {
-          const { name: n, email: e, question: q } = pendingMailRef.current;
-          const subject = encodeURIComponent(`Question from ${n}`);
-          const body = encodeURIComponent(
-            `Name: ${n}\nEmail: ${e}\n\n${q}`,
-          );
-          window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
-          pendingMailRef.current = null;
-        }
-      }, 2100),
-    );
+    timersRef.current.push(window.setTimeout(() => setPhase("envelope"), 450));
+    timersRef.current.push(window.setTimeout(() => setPhase("plane"), 950));
+    timersRef.current.push(window.setTimeout(() => setPhase("fly"), 1350));
+    timersRef.current.push(window.setTimeout(() => setPhase("gone"), 2300));
     timersRef.current.push(
       window.setTimeout(() => {
         setName("");
@@ -53,11 +39,11 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
         setQuestion("");
         setPhase("letter");
         busyRef.current = false;
-      }, 3400),
+      }, 3600),
     );
   }
 
-  // Scroll-away: visual sequence only (no mail — no form data)
+  // Scroll-away visual only — timers must NOT clear when phase changes
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
@@ -67,22 +53,22 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
         if (
           !entry.isIntersecting &&
           entry.boundingClientRect.top < 0 &&
-          !busyRef.current &&
-          phase === "letter"
+          !busyRef.current
         ) {
-          runSequence(false);
+          runVisualSequence();
         }
       },
-      { threshold: 0.12 },
+      { threshold: 0.1 },
     );
 
     observer.observe(el);
     return () => {
       observer.disconnect();
+      // only clear on unmount
       clearTimers();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase]);
+  }, []);
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -92,8 +78,19 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
     if (!n || !em || !q || busyRef.current) return;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return;
 
-    pendingMailRef.current = { name: n, email: em, question: q };
-    runSequence(true);
+    // Open mail client NOW (user gesture) — delayed location.href often gets blocked
+    const subject = encodeURIComponent(`Question from ${n}`);
+    const body = encodeURIComponent(`Name: ${n}\nEmail: ${em}\n\n${q}`);
+    const href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
+
+    const a = document.createElement("a");
+    a.href = href;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    runVisualSequence();
   }
 
   const canSend =
@@ -102,88 +99,96 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
     email.trim().length > 0 &&
     question.trim().length > 0;
 
-  if (phase === "gone") {
-    return <div ref={rootRef} className="faq-letter-slot" aria-hidden />;
-  }
-
   return (
     <div ref={rootRef} className="faq-letter-slot">
       <div className={`faq-mail faq-mail--${phase}`}>
-        {(phase === "letter" || phase === "fold") && (
-          <div className="faq-letter">
-            <div className="faq-letter__crease" aria-hidden />
-            <p className="faq-letter__label">Write to us</p>
-            <form className="faq-letter__form" onSubmit={onSubmit}>
-              <input
-                className="faq-letter__field"
-                type="text"
-                name="name"
-                autoComplete="name"
-                placeholder="Your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                disabled={phase !== "letter"}
-                required
-              />
-              <input
-                className="faq-letter__field"
-                type="email"
-                name="email"
-                autoComplete="email"
-                placeholder="Your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={phase !== "letter"}
-                required
-              />
-              <textarea
-                className="faq-letter__input"
-                name="question"
-                rows={3}
-                placeholder="Your question…"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                disabled={phase !== "letter"}
-                required
-              />
-              <button
-                type="submit"
-                className="faq-letter__send"
-                disabled={!canSend}
-              >
-                Send
-              </button>
-            </form>
-          </div>
-        )}
+        {/* Keep layers mounted so CSS animations can run */}
+        <div
+          className="faq-letter"
+          style={{
+            visibility:
+              phase === "letter" || phase === "fold" ? "visible" : "hidden",
+            pointerEvents: phase === "letter" ? "auto" : "none",
+          }}
+        >
+          <div className="faq-letter__crease" aria-hidden />
+          <p className="faq-letter__label">Write to us</p>
+          <form className="faq-letter__form" onSubmit={onSubmit}>
+            <input
+              className="faq-letter__field"
+              type="text"
+              name="name"
+              autoComplete="name"
+              placeholder="Your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={phase !== "letter"}
+              required
+            />
+            <input
+              className="faq-letter__field"
+              type="email"
+              name="email"
+              autoComplete="email"
+              placeholder="Your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={phase !== "letter"}
+              required
+            />
+            <textarea
+              className="faq-letter__input"
+              name="question"
+              rows={3}
+              placeholder="Your question…"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              disabled={phase !== "letter"}
+              required
+            />
+            <button type="submit" className="faq-letter__send" disabled={!canSend}>
+              Send
+            </button>
+          </form>
+        </div>
 
-        {(phase === "envelope" || phase === "plane") && (
-          <div className="faq-mail-envelope" aria-hidden>
-            <div className="faq-mail-envelope__flap" />
-            <div className="faq-mail-envelope__body" />
-          </div>
-        )}
+        <div
+          className="faq-mail-envelope"
+          aria-hidden
+          style={{
+            visibility:
+              phase === "envelope" || phase === "plane" ? "visible" : "hidden",
+          }}
+        >
+          <div className="faq-mail-envelope__flap" />
+          <div className="faq-mail-envelope__body" />
+        </div>
 
-        {(phase === "plane" || phase === "fly") && (
-          <div className="faq-plane" aria-hidden>
-            <svg viewBox="0 0 64 64" className="faq-plane__svg">
-              <path
-                d="M4 30 L60 8 L28 34 L24 52 L20 34 Z"
-                fill="#f3f0ea"
-                stroke="#141414"
-                strokeWidth="1.4"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M28 34 L60 8 L36 36 Z"
-                fill="#e4e0d8"
-                stroke="#141414"
-                strokeWidth="1"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-        )}
+        <div
+          className="faq-plane"
+          aria-hidden
+          style={{
+            visibility:
+              phase === "plane" || phase === "fly" ? "visible" : "hidden",
+          }}
+        >
+          <svg viewBox="0 0 64 64" className="faq-plane__svg">
+            <path
+              d="M4 30 L60 8 L28 34 L24 52 L20 34 Z"
+              fill="#f3f0ea"
+              stroke="#141414"
+              strokeWidth="1.4"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M28 34 L60 8 L36 36 Z"
+              fill="#e4e0d8"
+              stroke="#141414"
+              strokeWidth="1"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
       </div>
     </div>
   );

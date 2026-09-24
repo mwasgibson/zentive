@@ -1,9 +1,9 @@
 /* =========================================================
-   SPACE ACCENTS — platform falloff, FAQ letter, CTA void
+   SPACE ACCENTS — FAQ letter sequence + CTA void
+   (platform styles left for existing falloff only — do not add wordmark)
    ========================================================= */
 
-/* --- Platform: light falloff ---
-*/
+/* Platform falloff only — no wordmark */
 .platform-stage {
   position: relative;
 }
@@ -19,20 +19,12 @@
     top: 0;
     bottom: 0;
     right: 0;
-    left: min(100%, 64rem);
     width: 12rem;
     pointer-events: none;
     background: linear-gradient(
       to right,
       rgba(20, 20, 20, 0.06),
       transparent 70%
-    );
-    mask-image: linear-gradient(
-      to bottom,
-      transparent,
-      #000 20%,
-      #000 80%,
-      transparent
     );
   }
 }
@@ -51,17 +43,17 @@
     width: 2.5rem;
     pointer-events: none;
     background: linear-gradient(to right, rgba(20, 20, 20, 0.1), transparent);
-    border-radius: 0 1rem 1rem 0;
     filter: blur(8px);
   }
 }
 
-/* --- FAQ letter → fold → envelope → plane --- */
+/* --- FAQ letter --- */
 .faq-letter-slot {
   position: relative;
   margin-top: 2rem;
   min-height: 14rem;
   max-width: 22rem;
+  perspective: 800px;
 }
 
 .faq-mail {
@@ -72,6 +64,7 @@
 
 .faq-letter {
   position: relative;
+  z-index: 2;
   border: 1px solid rgba(20, 20, 20, 0.12);
   background:
     repeating-linear-gradient(
@@ -82,15 +75,14 @@
       rgba(20, 112, 111, 0.07) calc(1.55rem + 1px)
     ),
     linear-gradient(165deg, #fbf9f4 0%, #f0ebe3 100%);
-  background-size:
-    100% 1.6rem,
-    100% 100%;
+  background-size: 100% 1.6rem, 100% 100%;
   border-radius: 0.15rem 0.15rem 0.5rem 0.5rem;
   padding: 1.1rem 1.05rem 1rem;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.8) inset,
     0 12px 24px -14px rgba(20, 20, 20, 0.16);
   transform-origin: center top;
+  transform-style: preserve-3d;
 }
 
 .faq-letter__crease {
@@ -177,7 +169,15 @@
 }
 
 .faq-mail--fold .faq-letter {
-  animation: letter-fold 420ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: letter-fold 450ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.faq-mail--envelope .faq-letter,
+.faq-mail--plane .faq-letter,
+.faq-mail--fly .faq-letter,
+.faq-mail--gone .faq-letter {
+  opacity: 0;
+  pointer-events: none;
 }
 
 @keyframes letter-fold {
@@ -185,12 +185,12 @@
     transform: scaleY(1) rotateX(0deg);
     opacity: 1;
   }
-  55% {
-    transform: scaleY(0.35) rotateX(55deg);
-    opacity: 0.85;
+  60% {
+    transform: scaleY(0.4) rotateX(50deg);
+    opacity: 0.9;
   }
   100% {
-    transform: scaleY(0.08) rotateX(88deg);
+    transform: scaleY(0.06) rotateX(85deg);
     opacity: 0;
   }
 }
@@ -202,7 +202,17 @@
   width: 9.5rem;
   height: 6.2rem;
   transform: translate(-50%, -50%);
-  animation: envelope-in 380ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.faq-mail--envelope .faq-mail-envelope {
+  animation: envelope-in 400ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.faq-mail--plane .faq-mail-envelope {
+  animation: envelope-to-plane 320ms ease forwards;
 }
 
 .faq-mail-envelope__body {
@@ -225,7 +235,10 @@
   border-bottom: none;
   clip-path: polygon(0 0, 50% 100%, 100% 0);
   transform-origin: top center;
-  animation: flap-close 360ms ease forwards 80ms;
+}
+
+.faq-mail--envelope .faq-mail-envelope__flap {
+  animation: flap-close 360ms ease forwards 60ms;
 }
 
 @keyframes envelope-in {
@@ -241,21 +254,17 @@
 
 @keyframes flap-close {
   from {
-    transform: rotateX(-40deg);
+    transform: rotateX(-45deg);
   }
   to {
     transform: rotateX(0deg);
   }
 }
 
-.faq-mail--plane .faq-mail-envelope {
-  animation: envelope-to-plane 320ms ease forwards;
-}
-
 @keyframes envelope-to-plane {
   to {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.4) rotate(-20deg);
+    transform: translate(-50%, -50%) scale(0.35) rotate(-18deg);
   }
 }
 
@@ -266,7 +275,9 @@
   width: 3.25rem;
   height: 3.25rem;
   transform: translate(-50%, -50%);
-  z-index: 2;
+  z-index: 4;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .faq-plane__svg {
@@ -277,13 +288,17 @@
 }
 
 .faq-mail--plane .faq-plane {
-  animation: plane-form 300ms cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+  animation: plane-form 320ms cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+}
+
+.faq-mail--fly .faq-plane {
+  animation: plane-fly 950ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes plane-form {
   from {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.4) rotate(-30deg);
+    transform: translate(-50%, -50%) scale(0.35) rotate(-25deg);
   }
   to {
     opacity: 1;
@@ -291,30 +306,21 @@
   }
 }
 
-.faq-mail--fly .faq-plane {
-  animation: plane-fly 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.faq-mail--fly .faq-mail-envelope {
-  opacity: 0;
-}
-
 @keyframes plane-fly {
   0% {
     opacity: 1;
     transform: translate(-50%, -50%) rotate(0deg) scale(1);
   }
-  25% {
-    transform: translate(10%, -90%) rotate(-18deg) scale(0.95);
+  30% {
+    transform: translate(15%, -100%) rotate(-16deg) scale(0.95);
   }
   100% {
     opacity: 0;
-    transform: translate(140%, -220%) rotate(-28deg) scale(0.55);
+    transform: translate(160%, -240%) rotate(-30deg) scale(0.5);
   }
 }
 
-/* --- CTA void: EHT-style SVG ---
-*/
+/* --- CTA void: under button, larger, stars, no orange --- */
 .cta-row {
   position: relative;
   width: 100%;
@@ -328,10 +334,11 @@
   .cta-void {
     display: block;
     position: absolute;
-    right: 0;
+    /* tucked under / beside the button cluster, not far-right edge */
+    left: calc(100% - min(42vw, 26rem));
     top: 50%;
-    width: min(30vw, 19rem);
-    height: 12rem;
+    width: min(28vw, 22rem);
+    height: min(28vw, 22rem);
     transform: translateY(-50%);
     pointer-events: none;
     z-index: 0;
@@ -343,33 +350,19 @@
     height: 100%;
   }
 
-  .cta-void__disk {
-    animation: void-disk-spin 28s linear infinite;
-    transform-origin: 160px 100px;
-  }
-
-  .cta-void__ring {
-    animation: void-ring-pulse 5s ease-in-out infinite;
-    transform-origin: 160px 100px;
+  .cta-void__star {
+    animation: star-stretch 3.2s ease-in-out infinite;
   }
 }
 
-@keyframes void-disk-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes void-ring-pulse {
+@keyframes star-stretch {
   0%,
   100% {
-    opacity: 0.85;
+    opacity: 0.35;
+    stroke-dashoffset: 0;
   }
   50% {
-    opacity: 1;
+    opacity: 0.7;
   }
 }
 
@@ -393,12 +386,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cta-void__disk,
-  .cta-void__ring,
+  .cta-void__star,
   .cta-resist,
   .faq-mail--fold .faq-letter,
-  .faq-mail-envelope,
-  .faq-plane {
+  .faq-mail--envelope .faq-mail-envelope,
+  .faq-mail--plane .faq-plane,
+  .faq-mail--fly .faq-plane {
     animation: none !important;
   }
 }

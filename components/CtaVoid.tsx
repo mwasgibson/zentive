@@ -1,87 +1,87 @@
 "use client";
 
 /**
- * EHT-style void: black shadow + photon ring + warm accretion disk.
- * Matches how people recognise a real gravitational void (M87 / NASA).
- * Pure SVG — no canvas particles.
+ * Dark void tucked under the CTA button.
+ * Black core + stretched star streaks (no orange).
  */
 export function CtaVoid() {
+  // Fixed star positions — radial streaks that stretch outward from the core
+  const stars = [
+    { a: 12, r: 42, len: 18 },
+    { a: 38, r: 48, len: 22 },
+    { a: 55, r: 40, len: 14 },
+    { a: 78, r: 52, len: 26 },
+    { a: 105, r: 45, len: 16 },
+    { a: 130, r: 50, len: 20 },
+    { a: 155, r: 38, len: 12 },
+    { a: 178, r: 55, len: 24 },
+    { a: 200, r: 44, len: 18 },
+    { a: 225, r: 50, len: 22 },
+    { a: 250, r: 42, len: 15 },
+    { a: 275, r: 48, len: 20 },
+    { a: 300, r: 40, len: 14 },
+    { a: 325, r: 53, len: 25 },
+    { a: 25, r: 60, len: 10 },
+    { a: 95, r: 62, len: 12 },
+    { a: 165, r: 58, len: 11 },
+    { a: 240, r: 61, len: 13 },
+    { a: 310, r: 59, len: 10 },
+  ];
+
+  const cx = 100;
+  const cy = 100;
+
   return (
     <div className="cta-void" aria-hidden>
       <svg
         className="cta-void__svg"
-        viewBox="0 0 320 200"
+        viewBox="0 0 200 200"
         preserveAspectRatio="xMidYMid meet"
       >
         <defs>
-          {/* Accretion disk — orange/amber like EHT imagery */}
-          <radialGradient id="void-disk" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#0a0a0a" stopOpacity="1" />
-            <stop offset="28%" stopColor="#0a0a0a" stopOpacity="1" />
-            <stop offset="32%" stopColor="#c45f12" stopOpacity="0.95" />
-            <stop offset="42%" stopColor="#e2711d" stopOpacity="0.55" />
-            <stop offset="55%" stopColor="#8b4510" stopOpacity="0.25" />
-            <stop offset="72%" stopColor="#141414" stopOpacity="0.08" />
+          <radialGradient id="void-core" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#000000" stopOpacity="1" />
+            <stop offset="55%" stopColor="#0a0a0a" stopOpacity="0.95" />
+            <stop offset="78%" stopColor="#141414" stopOpacity="0.35" />
             <stop offset="100%" stopColor="#141414" stopOpacity="0" />
           </radialGradient>
-
-          {/* Photon ring glow */}
-          <radialGradient id="void-ring" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#fff5e6" stopOpacity="0" />
-            <stop offset="30%" stopColor="#fff5e6" stopOpacity="0" />
-            <stop offset="34%" stopColor="#ffe0b2" stopOpacity="0.85" />
-            <stop offset="38%" stopColor="#e2711d" stopOpacity="0.4" />
-            <stop offset="45%" stopColor="#c45f12" stopOpacity="0" />
+          <radialGradient id="void-rim" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+            <stop offset="62%" stopColor="#ffffff" stopOpacity="0" />
+            <stop offset="70%" stopColor="#ffffff" stopOpacity="0.18" />
+            <stop offset="78%" stopColor="#ffffff" stopOpacity="0" />
           </radialGradient>
-
-          {/* Soft outer haze */}
-          <radialGradient id="void-haze" cx="50%" cy="50%" r="50%">
-            <stop offset="50%" stopColor="#141414" stopOpacity="0" />
-            <stop offset="78%" stopColor="#141414" stopOpacity="0.06" />
-            <stop offset="100%" stopColor="#141414" stopOpacity="0" />
-          </radialGradient>
-
-          <filter id="void-blur" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="2.5" />
-          </filter>
         </defs>
 
-        {/* Haze */}
-        <ellipse cx="160" cy="100" rx="150" ry="95" fill="url(#void-haze)" />
+        {/* Soft dark pull */}
+        <circle cx={cx} cy={cy} r="88" fill="url(#void-core)" />
 
-        {/* Disk (slightly elliptical — edge-on bias like NASA views) */}
-        <ellipse
-          className="cta-void__disk"
-          cx="160"
-          cy="100"
-          rx="110"
-          ry="72"
-          fill="url(#void-disk)"
-          filter="url(#void-blur)"
-        />
+        {/* Stretched stars — lines from near-core outward */}
+        {stars.map((s, i) => {
+          const rad = (s.a * Math.PI) / 180;
+          const x1 = cx + Math.cos(rad) * s.r;
+          const y1 = cy + Math.sin(rad) * s.r;
+          const x2 = cx + Math.cos(rad) * (s.r + s.len);
+          const y2 = cy + Math.sin(rad) * (s.r + s.len);
+          return (
+            <line
+              key={i}
+              className="cta-void__star"
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
+              stroke="rgba(20,20,20,0.45)"
+              strokeWidth={i % 3 === 0 ? 1.2 : 0.7}
+              strokeLinecap="round"
+              style={{ animationDelay: `${(i % 7) * 0.35}s` }}
+            />
+          );
+        })}
 
-        {/* Photon ring */}
-        <ellipse
-          className="cta-void__ring"
-          cx="160"
-          cy="100"
-          rx="48"
-          ry="48"
-          fill="url(#void-ring)"
-        />
-
-        {/* Event-horizon shadow */}
-        <circle cx="160" cy="100" r="36" fill="#050505" />
-
-        {/* Thin bright ring edge */}
-        <circle
-          cx="160"
-          cy="100"
-          r="37.5"
-          fill="none"
-          stroke="rgba(255, 224, 178, 0.35)"
-          strokeWidth="1.2"
-        />
+        {/* Thin rim */}
+        <circle cx={cx} cy={cy} r="32" fill="url(#void-rim)" />
+        <circle cx={cx} cy={cy} r="28" fill="#050505" />
       </svg>
     </div>
   );
