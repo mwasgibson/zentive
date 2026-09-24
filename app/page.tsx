@@ -388,8 +388,9 @@ export default async function HomePage() {
 
         {/* FINAL CTA */}
         <Reveal>
-          <section className="border-t border-border bg-surface py-20">
-            <div className="section cta-row flex flex-col items-start gap-8 lg:flex-row lg:items-center">
+          <section className="cta-section border-t border-border bg-surface py-20">
+            <CtaVoid />
+            <div className="section cta-row relative z-[1] flex flex-col items-start gap-8 lg:flex-row lg:items-center">
               <div className="relative z-[1]">
                 <h2 className="max-w-xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                   {page.final_cta.headline}
@@ -414,7 +415,6 @@ export default async function HomePage() {
                   </a>
                 </Magnetic>
               </div>
-              <CtaVoid />
             </div>
           </section>
         </Reveal>
