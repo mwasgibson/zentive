@@ -16,13 +16,12 @@
 .terminal-atmosphere__vignette {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(
-      ellipse 80% 70% at 50% 40%,
-      transparent 0%,
-      rgba(0, 0, 0, 0.35) 55%,
-      rgba(0, 0, 0, 0.72) 100%
-    );
+  background: radial-gradient(
+    ellipse 80% 70% at 50% 40%,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 55%,
+    rgba(0, 0, 0, 0.72) 100%
+  );
   animation: terminal-breathe 7s ease-in-out infinite;
 }
 
@@ -55,7 +54,7 @@
   }
 }
 
-/* --- Platform: light falloff off the panel + wordmark ---
+/* --- Platform: light falloff off the panel ---
 */
 .platform-stage {
   position: relative;
@@ -79,33 +78,14 @@
       rgba(20, 20, 20, 0.06),
       transparent 70%
     );
-    mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      #000 20%,
+      #000 80%,
+      transparent
+    );
   }
-
-  .platform-stage__wordmark {
-    display: block;
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    font-family: theme("fontFamily.display", ui-sans-serif);
-    font-size: clamp(4rem, 11vw, 8.5rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1;
-    color: theme("colors.ink");
-    opacity: 0.045;
-    pointer-events: none;
-    user-select: none;
-    white-space: nowrap;
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    transform: translateY(-50%) rotate(180deg);
-  }
-}
-
-.platform-stage__wordmark {
-  display: none;
 }
 
 /* Panel edge shadow — light falls off to the right */
@@ -122,11 +102,7 @@
     right: -1.5rem;
     width: 2.5rem;
     pointer-events: none;
-    background: linear-gradient(
-      to right,
-      rgba(20, 20, 20, 0.1),
-      transparent
-    );
+    background: linear-gradient(to right, rgba(20, 20, 20, 0.1), transparent);
     border-radius: 0 1rem 1rem 0;
     filter: blur(8px);
   }
@@ -204,7 +180,9 @@
   line-height: 1.45;
   color: theme("colors.ink");
   outline: none;
-  transition: border-color 180ms ease, box-shadow 180ms ease;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .faq-envelope__input:focus {
@@ -229,7 +207,9 @@
   font-weight: 600;
   padding: 0.45rem 0.9rem;
   cursor: pointer;
-  transition: background 180ms ease, transform 120ms ease;
+  transition:
+    background 180ms ease,
+    transform 120ms ease;
 }
 
 .faq-envelope__send:hover {

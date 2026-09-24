@@ -116,9 +116,7 @@ export default async function HomePage() {
           >
             <div className="section platform-stage">
               <span className="platform-stage__falloff" aria-hidden />
-              <span className="platform-stage__wordmark" aria-hidden>
-                {siteConfig.productName}
-              </span>
+
               <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                 {page.features.heading}
               </h2>
