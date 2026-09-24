@@ -27,11 +27,12 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
     busyRef.current = true;
     clearTimers();
 
+    // Timings match the longer CSS keyframes so each stage is readable
     setPhase("fold");
-    timersRef.current.push(window.setTimeout(() => setPhase("envelope"), 450));
-    timersRef.current.push(window.setTimeout(() => setPhase("plane"), 950));
-    timersRef.current.push(window.setTimeout(() => setPhase("fly"), 1350));
-    timersRef.current.push(window.setTimeout(() => setPhase("gone"), 2300));
+    timersRef.current.push(window.setTimeout(() => setPhase("envelope"), 720));
+    timersRef.current.push(window.setTimeout(() => setPhase("plane"), 1450));
+    timersRef.current.push(window.setTimeout(() => setPhase("fly"), 2000));
+    timersRef.current.push(window.setTimeout(() => setPhase("gone"), 3200));
     timersRef.current.push(
       window.setTimeout(() => {
         setName("");
@@ -39,11 +40,10 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
         setQuestion("");
         setPhase("letter");
         busyRef.current = false;
-      }, 3600),
+      }, 4500),
     );
   }
 
-  // Scroll-away visual only — timers must NOT clear when phase changes
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
@@ -64,7 +64,6 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
     observer.observe(el);
     return () => {
       observer.disconnect();
-      // only clear on unmount
       clearTimers();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -78,7 +77,6 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
     if (!n || !em || !q || busyRef.current) return;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return;
 
-    // Open mail client NOW (user gesture) — delayed location.href often gets blocked
     const subject = encodeURIComponent(`Question from ${n}`);
     const body = encodeURIComponent(`Name: ${n}\nEmail: ${em}\n\n${q}`);
     const href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
@@ -102,7 +100,6 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
   return (
     <div ref={rootRef} className="faq-letter-slot">
       <div className={`faq-mail faq-mail--${phase}`}>
-        {/* Keep layers mounted so CSS animations can run */}
         <div
           className="faq-letter"
           style={{
@@ -139,7 +136,7 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
             <textarea
               className="faq-letter__input"
               name="question"
-              rows={3}
+              rows={4}
               placeholder="Your question…"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
@@ -177,14 +174,14 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
               d="M4 30 L60 8 L28 34 L24 52 L20 34 Z"
               fill="#f3f0ea"
               stroke="#141414"
-              strokeWidth="1.4"
+              strokeWidth="1.6"
               strokeLinejoin="round"
             />
             <path
               d="M28 34 L60 8 L36 36 Z"
               fill="#e4e0d8"
               stroke="#141414"
-              strokeWidth="1"
+              strokeWidth="1.2"
               strokeLinejoin="round"
             />
           </svg>
