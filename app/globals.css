@@ -1,2 +1,219 @@
 @tailwind base;
-SEE_FILE
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-paper text-text font-body antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display;
+  }
+
+  ::selection {
+    @apply bg-signal/20 text-ink;
+  }
+
+  :focus-visible {
+    outline: 2px solid #e2711d;
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply font-mono text-xs uppercase tracking-[0.16em] text-wire;
+  }
+
+  .section {
+    @apply mx-auto w-full px-6 sm:px-8;
+  }
+
+  .card {
+    @apply rounded-xl border border-border bg-surface p-6;
+  }
+
+  .btn-primary {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper transition duration-fast hover:bg-signal-dark active:scale-[0.98];
+    isolation: isolate;
+  }
+
+  .btn-primary::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 9999px;
+    background: radial-gradient(
+      circle at 50% 0%,
+      rgba(226, 113, 29, 0.25),
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 300ms ease;
+    z-index: -1;
+  }
+
+  .btn-primary:hover::before {
+    opacity: 1;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink/20 px-6 py-3 text-sm font-semibold text-ink transition duration-fast hover:border-ink active:scale-[0.98];
+  }
+
+  .logo {
+    @apply font-display text-2xl font-bold tracking-tight text-ink
+      transition-colors duration-200
+      hover:text-signal-dark
+      focus-visible:outline-2 focus-visible:outline-[#E2711D] focus-visible:outline-offset-2;
+  }
+}
+
+/* =========================================================
+   HERO — delivery status chat bubbles
+   ========================================================= */
+
+.hero-signal {
+  isolation: isolate;
+  background:
+    radial-gradient(
+      circle at 85% 10%,
+      rgba(226, 113, 29, 0.08),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 15% 80%,
+      rgba(20, 112, 111, 0.06),
+      transparent 35%
+    ),
+    #f8f6f1;
+}
+
+.delivery-bubble {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  animation: delivery-bubble-cycle 4.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  filter: blur(1.2px);
+}
+
+.delivery-bubble-text {
+  font-family: theme("fontFamily.mono");
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0.4rem 0.7rem;
+  border-radius: 1rem;
+  position: relative;
+}
+
+.delivery-bubble-text::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.bubble-a .delivery-bubble-text {
+  background: #141414;
+  color: #f3f5f1;
+  border-radius: 1rem 1rem 1rem 0.25rem;
+}
+.bubble-a .delivery-bubble-text::after {
+  left: 0;
+  bottom: -5px;
+  border-width: 6px 8px 0 0;
+  border-color: #141414 transparent transparent transparent;
+}
+
+.bubble-b .delivery-bubble-text {
+  background: #fff;
+  color: #141414;
+  border: 1px solid rgba(20, 20, 20, 0.12);
+  border-radius: 1rem 1rem 0.25rem 1rem;
+  box-shadow: 0 1px 3px rgba(20, 20, 20, 0.06);
+}
+.bubble-b .delivery-bubble-text::after {
+  right: 0;
+  bottom: -5px;
+  border-width: 6px 0 0 8px;
+  border-color: #fff transparent transparent transparent;
+  filter: drop-shadow(0 1px 0 rgba(20, 20, 20, 0.08));
+}
+
+.bubble-c .delivery-bubble-text {
+  background: rgba(226, 113, 29, 0.16);
+  color: #c45f12;
+  border: 1px solid rgba(226, 113, 29, 0.28);
+  border-radius: 1rem 1rem 1rem 0.25rem;
+}
+.bubble-c .delivery-bubble-text::after {
+  left: 0;
+  bottom: -5px;
+  border-width: 6px 8px 0 0;
+  border-color: rgba(226, 113, 29, 0.28) transparent transparent transparent;
+}
+
+.bubble-d .delivery-bubble-text {
+  background: rgba(20, 112, 111, 0.14);
+  color: #14706f;
+  border: 1px solid rgba(20, 112, 111, 0.28);
+  border-radius: 1rem 1rem 0.25rem 1rem;
+}
+.bubble-d .delivery-bubble-text::after {
+  right: 0;
+  bottom: -5px;
+  border-width: 6px 0 0 8px;
+  border-color: rgba(20, 112, 111, 0.28) transparent transparent transparent;
+}
+
+.bubble-e .delivery-bubble-text {
+  background: transparent;
+  color: #141414;
+  border: 1.5px solid rgba(20, 20, 20, 0.22);
+  border-radius: 0.25rem 1rem 1rem 1rem;
+}
+.bubble-e .delivery-bubble-text::after {
+  left: 0;
+  top: -5px;
+  border-width: 0 0 6px 8px;
+  border-color: transparent transparent rgba(20, 20, 20, 0.22) transparent;
+}
+
+@keyframes delivery-bubble-cycle {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.92);
+  }
+  12% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  78% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+}
