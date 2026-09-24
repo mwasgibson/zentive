@@ -2,6 +2,7 @@ import { RouteDiagram } from "@/components/RouteDiagram";
 import { PlatformTabs } from "@/components/PlatformTabs";
 import { FaqItem } from "@/components/FaqItem";
 import { FaqEnvelope } from "@/components/FaqEnvelope";
+import { CtaVoid } from "@/components/CtaVoid";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SecurityIcon } from "@/components/Securityicon";
@@ -116,7 +117,6 @@ export default async function HomePage() {
           >
             <div className="section platform-stage">
               <span className="platform-stage__falloff" aria-hidden />
-
               <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                 {page.features.heading}
               </h2>
@@ -414,15 +414,7 @@ export default async function HomePage() {
                   </a>
                 </Magnetic>
               </div>
-              {/* Void sits after the button on wide screens */}
-              <div className="cta-void" aria-hidden>
-                <div className="cta-void__core" />
-                <div className="cta-void__rim" />
-                <span className="cta-void__speck" />
-                <span className="cta-void__speck" />
-                <span className="cta-void__speck" />
-                <span className="cta-void__speck" />
-              </div>
+              <CtaVoid />
             </div>
           </section>
         </Reveal>
