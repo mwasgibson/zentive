@@ -364,11 +364,16 @@
   }
 }
 
-/* --- CTA void: NASA GIF, right edge → fills toward button --- */
+/* --- CTA void: full section, stars/pull media, right → button --- */
+.cta-section {
+  position: relative;
+  overflow: hidden;
+}
+
 .cta-row {
   position: relative;
   width: 100%;
-  overflow: hidden;
+  z-index: 1;
 }
 
 .cta-void {
@@ -379,27 +384,26 @@
   .cta-void {
     display: block;
     position: absolute;
-    right: -2rem;
-    top: 50%;
-    width: min(38vw, 28rem);
-    height: min(38vw, 28rem);
-    transform: translateY(-50%);
+    /* Full section fill */
+    inset: 0;
     pointer-events: none;
     z-index: 0;
-    /* Dense on the right, dissolves toward the button (left) */
+    /* Strong on the right, dissolves toward text/button on the left */
     -webkit-mask-image: linear-gradient(
       to left,
       #000 0%,
-      #000 35%,
-      rgba(0, 0, 0, 0.55) 60%,
-      transparent 100%
+      #000 28%,
+      rgba(0, 0, 0, 0.65) 48%,
+      rgba(0, 0, 0, 0.25) 68%,
+      transparent 92%
     );
     mask-image: linear-gradient(
       to left,
       #000 0%,
-      #000 35%,
-      rgba(0, 0, 0, 0.55) 60%,
-      transparent 100%
+      #000 28%,
+      rgba(0, 0, 0, 0.65) 48%,
+      rgba(0, 0, 0, 0.25) 68%,
+      transparent 92%
     );
   }
 
@@ -408,9 +412,8 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center;
-    opacity: 0.9;
-    mix-blend-mode: multiply;
+    object-position: 70% center;
+    opacity: 0.85;
   }
 }
 
@@ -440,9 +443,5 @@
   .faq-mail--plane .faq-plane,
   .faq-mail--fly .faq-plane {
     animation: none !important;
-  }
-
-  .cta-void__media {
-    animation: none;
   }
 }

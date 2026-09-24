@@ -1,9 +1,10 @@
 "use client";
 
 /**
- * Real media void — NASA public-domain black-hole visualization GIF.
- * Anchored at the right edge of the CTA row, fills left toward the button.
- * Credit: NASA Goddard / Jeremy Schnittman (public domain).
+ * Full-section void media.
+ * NASA public-domain visualization of space falling into a black hole
+ * (stars + gravitational pull — not a spinning ring crop).
+ * Credit: NASA Goddard.
  */
 export function CtaVoid() {
   return (
@@ -11,10 +12,10 @@ export function CtaVoid() {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="cta-void__media"
-        src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/BH_Accretion_Disk_Sim_360_Continuous.gif/500px-BH_Accretion_Disk_Sim_360_Continuous.gif"
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Black_hole_representation.gif/960px-Black_hole_representation.gif"
         alt=""
-        width={500}
-        height={500}
+        width={960}
+        height={554}
         decoding="async"
       />
     </div>
