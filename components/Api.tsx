@@ -17,9 +17,9 @@ type LogLine = {
 /** Wait before starting (or restarting) the idle demo. */
 const IDLE_START_MS = 4200;
 /** Gap between each of the three demo commands. */
-const DEMO_STEP_MS = 1400;
+const DEMO_STEP_MS = 2500;
 /** Pause after clear before the next batch of commands. */
-const DEMO_LOOP_MS = 2200;
+const DEMO_LOOP_MS = 1200;
 
 function shortPath(path: string) {
   return path.replace(/^\/v1/, "") || path;
@@ -189,7 +189,11 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
     }
 
     const start = window.setTimeout(() => {
-      if (!inViewRef.current || focusedRef.current || hasInteractedRef.current) {
+      if (
+        !inViewRef.current ||
+        focusedRef.current ||
+        hasInteractedRef.current
+      ) {
         return;
       }
 
@@ -197,29 +201,20 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
       if (picks.length === 0) return;
 
       picks.forEach((ep, i) => {
-        const t = window.setTimeout(() => {
-          if (
-            !inViewRef.current ||
-            focusedRef.current ||
-            hasInteractedRef.current
-          ) {
-            return;
-          }
-          runCommand(`curl ${shortPath(ep.path)}`);
+        const t = window.setTimeout(
+          () => {
+            if (
+              !inViewRef.current ||
+              focusedRef.current ||
+              hasInteractedRef.current
+            ) {
+              return;
+            }
+            runCommand(`curl ${shortPath(ep.path)}`);
 
-          if (i === picks.length - 1) {
-            // After the third command: run real `clear`, then loop
-            const clearT = window.setTimeout(() => {
-              if (
-                !inViewRef.current ||
-                focusedRef.current ||
-                hasInteractedRef.current
-              ) {
-                return;
-              }
-              runCommand("clear");
-
-              const loopT = window.setTimeout(() => {
+            if (i === picks.length - 1) {
+              // After the third command: run real `clear`, then loop
+              const clearT = window.setTimeout(() => {
                 if (
                   !inViewRef.current ||
                   focusedRef.current ||
@@ -227,15 +222,27 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
                 ) {
                   return;
                 }
-                // Stay empty after clear — just fire the next batch
-                hasInteractedRef.current = false;
-                scheduleIdleCycle();
-              }, DEMO_LOOP_MS);
-              timersRef.current.push(loopT);
-            }, DEMO_STEP_MS);
-            timersRef.current.push(clearT);
-          }
-        }, DEMO_STEP_MS * (i + 1));
+                runCommand("clear");
+
+                const loopT = window.setTimeout(() => {
+                  if (
+                    !inViewRef.current ||
+                    focusedRef.current ||
+                    hasInteractedRef.current
+                  ) {
+                    return;
+                  }
+                  // Stay empty after clear — just fire the next batch
+                  hasInteractedRef.current = false;
+                  scheduleIdleCycle();
+                }, DEMO_LOOP_MS);
+                timersRef.current.push(loopT);
+              }, DEMO_STEP_MS);
+              timersRef.current.push(clearT);
+            }
+          },
+          DEMO_STEP_MS * (i + 1),
+        );
         timersRef.current.push(t);
       });
     }, IDLE_START_MS);
