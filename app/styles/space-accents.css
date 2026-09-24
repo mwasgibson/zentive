@@ -366,7 +366,7 @@
   }
 }
 
-/* --- CTA void: right edge → up to the button only (not full section) --- */
+/* --- CTA void: right edge → up to the button only --- */
 .cta-section {
   position: relative;
   overflow: hidden;
@@ -386,14 +386,12 @@
   .cta-void {
     display: block;
     position: absolute;
-    /* From the right edge leftward only as far as the button cluster */
     right: 0;
     top: 0;
     bottom: 0;
     width: 55%;
     pointer-events: none;
     z-index: 0;
-    /* Soft left edge so it meets the button area cleanly */
     -webkit-mask-image: linear-gradient(
       to left,
       #000 0%,
@@ -419,10 +417,15 @@
   }
 }
 
+/* Pull toward the void (right) — more noticeable */
 .cta-resist {
   position: relative;
   z-index: 1;
-  animation: cta-resist 4s ease-in-out infinite;
+  animation: cta-resist 3.2s ease-in-out infinite;
+}
+
+.cta-resist--flying {
+  animation: none !important;
 }
 
 @keyframes cta-resist {
@@ -430,11 +433,17 @@
   100% {
     transform: translateX(0);
   }
-  45% {
-    transform: translateX(4px);
+  35% {
+    transform: translateX(14px);
   }
-  60% {
-    transform: translateX(0);
+  48% {
+    transform: translateX(18px);
+  }
+  62% {
+    transform: translateX(6px);
+  }
+  78% {
+    transform: translateX(12px);
   }
 }
 
