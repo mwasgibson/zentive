@@ -1,9 +1,9 @@
 /* =========================================================
-   SPACE ACCENTS — FAQ letter sequence + CTA void
-   (platform styles left for existing falloff only — do not add wordmark)
+   SPACE ACCENTS — platform falloff, FAQ letter, CTA void
    ========================================================= */
 
-/* Platform falloff only — no wordmark */
+/* --- Platform: light falloff (restored from c5d12d7) ---
+*/
 .platform-stage {
   position: relative;
 }
@@ -19,12 +19,20 @@
     top: 0;
     bottom: 0;
     right: 0;
+    left: min(100%, 64rem);
     width: 12rem;
     pointer-events: none;
     background: linear-gradient(
       to right,
       rgba(20, 20, 20, 0.06),
       transparent 70%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      #000 20%,
+      #000 80%,
+      transparent
     );
   }
 }
@@ -43,6 +51,7 @@
     width: 2.5rem;
     pointer-events: none;
     background: linear-gradient(to right, rgba(20, 20, 20, 0.1), transparent);
+    border-radius: 0 1rem 1rem 0;
     filter: blur(8px);
   }
 }
@@ -334,7 +343,6 @@
   .cta-void {
     display: block;
     position: absolute;
-    /* tucked under / beside the button cluster, not far-right edge */
     left: calc(100% - min(42vw, 26rem));
     top: 50%;
     width: min(28vw, 22rem);
