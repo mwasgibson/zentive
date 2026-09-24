@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type ApiEndpoint = {
   method: string;
@@ -14,6 +14,8 @@ type LogLine = {
   text: string;
 };
 
+const IDLE_DEMO_MS = 4800;
+
 export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
   const [input, setInput] = useState("");
   const [logs, setLogs] = useState<LogLine[]>([]);
@@ -22,6 +24,14 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(0);
+  const hasInteractedRef = useRef(false);
+  const demoRanRef = useRef(false);
+  const endpointsRef = useRef(endpoints);
+  endpointsRef.current = endpoints;
+
+  const markInteracted = useCallback(() => {
+    hasInteractedRef.current = true;
+  }, []);
 
   useEffect(() => {
     // Initial welcome + list endpoints once
@@ -52,7 +62,7 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
     });
   }, [logs]);
 
-  const runCommand = (cmdRaw: string) => {
+  const runCommand = useCallback((cmdRaw: string) => {
     const cmd = cmdRaw.trim();
     if (!cmd) return;
 
@@ -63,6 +73,7 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
 
     const [command, ...args] = cmd.split(/\s+/);
     const lower = command.toLowerCase();
+    const list = endpointsRef.current;
 
     const response: {
       type: "info" | "error" | "success" | "muted";
@@ -82,7 +93,7 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
           type: "muted",
           text: "registered endpoints:",
         });
-        endpoints.forEach((e) => {
+        list.forEach((e) => {
           response.push({
             type: "success",
             text: `${e.method.padEnd(6)} ${e.path} — ${e.desc}`,
@@ -98,7 +109,7 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
             text: "usage: curl <path>  (e.g. curl /v1/send)",
           });
         } else {
-          const match = endpoints.find((e) => e.path === path);
+          const match = list.find((e) => e.path === path);
           if (!match) {
             response.push({
               type: "error",
@@ -138,9 +149,31 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
       ...prev,
       ...response.map((r) => ({ id: idRef.current++, ...r })),
     ]);
-  };
+  }, []);
+
+  // One-shot idle demo: run a curl if the user never touches the terminal
+  useEffect(() => {
+    if (demoRanRef.current) return;
+
+    const timer = window.setTimeout(() => {
+      if (hasInteractedRef.current || demoRanRef.current) return;
+      demoRanRef.current = true;
+
+      const list = endpointsRef.current;
+      const preferred =
+        list.find((e) => e.path.includes("/sms/send") && !e.path.includes("bulk")) ??
+        list.find((e) => e.method === "POST") ??
+        list[0];
+
+      if (!preferred) return;
+      runCommand(`curl ${preferred.path}`);
+    }, IDLE_DEMO_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [runCommand]);
 
   const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+    markInteracted();
     if (e.key === "Enter") {
       e.preventDefault();
       const cmd = input;
@@ -190,7 +223,10 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
       <div
         ref={containerRef}
         className="relative max-h-[22rem] overflow-y-auto"
-        onClick={() => inputRef.current?.focus()}
+        onClick={() => {
+          markInteracted();
+          inputRef.current?.focus();
+        }}
       >
         <div className="absolute inset-0 api-scanlines" />
         <div className="relative px-4 py-3">
@@ -219,7 +255,11 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
             <input
               ref={inputRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                markInteracted();
+                setInput(e.target.value);
+              }}
+              onFocus={markInteracted}
               onKeyDown={onKeyDown}
               className="flex-1 bg-transparent text-paper outline-none placeholder:text-paper/30"
               placeholder="type 'help' or 'curl /v1/send'…"
