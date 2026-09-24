@@ -324,7 +324,7 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
           <span className="h-2.5 w-2.5 rounded-full bg-green-500/80" />
         </div>
         <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-paper/50">
-          api.sh
+          api.sh · open box
         </div>
       </div>
 
@@ -336,11 +336,6 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
           inputRef.current?.focus();
         }}
       >
-        {/* Atmosphere under scanlines — reads strongest after clear */}
-        <div className="terminal-atmosphere" aria-hidden>
-          <div className="terminal-atmosphere__vignette" />
-          <div className="terminal-atmosphere__noise" />
-        </div>
         <div className="absolute inset-0 api-scanlines" />
         <div className="relative z-[1] px-4 py-3">
           {logs.map((log) => (
