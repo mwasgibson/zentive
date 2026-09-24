@@ -14,11 +14,8 @@ type LogLine = {
   text: string;
 };
 
-/** Wait before starting (or restarting) the idle demo. */
 const IDLE_START_MS = 4200;
-/** Gap between each of the three demo commands. */
 const DEMO_STEP_MS = 2500;
-/** Pause after clear before the next batch of commands. */
 const DEMO_LOOP_MS = 1200;
 
 function shortPath(path: string) {
@@ -108,10 +105,8 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
       const cmd = cmdRaw.trim();
       if (!cmd) return;
 
-      // clear wipes the screen — no prompt line left behind
       if (cmd.toLowerCase() === "clear") {
         pushLog("info", `user@usersmac ~ % clear`);
-        // brief beat so the clear line is visible, then empty
         window.setTimeout(() => setLogs([]), 180);
         return;
       }
@@ -176,12 +171,6 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
     [pushLog],
   );
 
-  /**
-   * Idle loop while the section is in view and the user is not focused:
-   *   3 random curls → clear command → wait → repeat
-   * Does not reseed the endpoint list after clear — screen stays empty until
-   * the next batch of commands (or until the section is left and re-entered).
-   */
   const scheduleIdleCycle = useCallback(() => {
     clearTimers();
     if (!inViewRef.current || focusedRef.current || hasInteractedRef.current) {
@@ -213,7 +202,6 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
             runCommand(`curl ${shortPath(ep.path)}`);
 
             if (i === picks.length - 1) {
-              // After the third command: run real `clear`, then loop
               const clearT = window.setTimeout(() => {
                 if (
                   !inViewRef.current ||
@@ -232,7 +220,6 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
                   ) {
                     return;
                   }
-                  // Stay empty after clear — just fire the next batch
                   hasInteractedRef.current = false;
                   scheduleIdleCycle();
                 }, DEMO_LOOP_MS);
@@ -250,8 +237,6 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
     timersRef.current.push(start);
   }, [clearTimers, runCommand]);
 
-  // IntersectionObserver: when the user scrolls away and back, restore
-  // the original welcome + endpoints and restart the idle demo.
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
@@ -263,13 +248,11 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
         inViewRef.current = nowInView;
 
         if (!nowInView) {
-          // Left the section — stop demo
           clearTimers();
           return;
         }
 
         if (!wasInView && nowInView) {
-          // Re-entered: restore original state
           hasInteractedRef.current = false;
           focusedRef.current = false;
           seedWelcome();
@@ -283,7 +266,6 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
     return () => observer.disconnect();
   }, [clearTimers, seedWelcome, scheduleIdleCycle]);
 
-  // Kick off idle cycle on mount
   useEffect(() => {
     scheduleIdleCycle();
     return () => clearTimers();
@@ -335,7 +317,6 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
 
   return (
     <div ref={rootRef} className="card overflow-hidden bg-ink !p-0">
-      {/* Terminal header */}
       <div className="flex items-center justify-between border-b border-paper/10 px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
@@ -347,7 +328,6 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
         </div>
       </div>
 
-      {/* Terminal body */}
       <div
         ref={containerRef}
         className="relative max-h-[22rem] overflow-y-auto"
@@ -356,8 +336,13 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
           inputRef.current?.focus();
         }}
       >
+        {/* Atmosphere under scanlines — reads strongest after clear */}
+        <div className="terminal-atmosphere" aria-hidden>
+          <div className="terminal-atmosphere__vignette" />
+          <div className="terminal-atmosphere__noise" />
+        </div>
         <div className="absolute inset-0 api-scanlines" />
-        <div className="relative px-4 py-3">
+        <div className="relative z-[1] px-4 py-3">
           {logs.map((log) => (
             <div
               key={log.id}
