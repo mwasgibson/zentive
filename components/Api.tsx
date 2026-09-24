@@ -18,11 +18,10 @@ type LogLine = {
 const IDLE_START_MS = 4200;
 /** Gap between each of the three demo commands. */
 const DEMO_STEP_MS = 1400;
-/** Pause after clear before the next cycle. */
-const DEMO_LOOP_MS = 2800;
+/** Pause after clear before the next batch of commands. */
+const DEMO_LOOP_MS = 2200;
 
 function shortPath(path: string) {
-  // Keep the useful tail: /v1/sms/send → /sms/send
   return path.replace(/^\/v1/, "") || path;
 }
 
@@ -47,19 +46,19 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(0);
   const focusedRef = useRef(false);
   const hasInteractedRef = useRef(false);
+  const inViewRef = useRef(true);
   const endpointsRef = useRef(endpoints);
   endpointsRef.current = endpoints;
   const timersRef = useRef<number[]>([]);
-  const cycleActiveRef = useRef(false);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach((t) => window.clearTimeout(t));
     timersRef.current = [];
-    cycleActiveRef.current = false;
   }, []);
 
   const markInteracted = useCallback(() => {
@@ -67,15 +66,9 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
     clearTimers();
   }, [clearTimers]);
 
-  const pushLog = useCallback(
-    (type: LogLine["type"], text: string) => {
-      setLogs((prev) => [
-        ...prev,
-        { id: idRef.current++, type, text },
-      ]);
-    },
-    [],
-  );
+  const pushLog = useCallback((type: LogLine["type"], text: string) => {
+    setLogs((prev) => [...prev, { id: idRef.current++, type, text }]);
+  }, []);
 
   const seedWelcome = useCallback(() => {
     const list = endpointsRef.current;
@@ -115,6 +108,14 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
       const cmd = cmdRaw.trim();
       if (!cmd) return;
 
+      // clear wipes the screen — no prompt line left behind
+      if (cmd.toLowerCase() === "clear") {
+        pushLog("info", `user@usersmac ~ % clear`);
+        // brief beat so the clear line is visible, then empty
+        window.setTimeout(() => setLogs([]), 180);
+        return;
+      }
+
       pushLog("info", `user@usersmac ~ % ${cmd}`);
 
       const [command, ...args] = cmd.split(/\s+/);
@@ -145,12 +146,12 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
             pushLog("error", "usage: curl <path>");
             break;
           }
-          // Accept short or full path
           const match = list.find(
             (e) =>
               e.path === pathArg ||
               shortPath(e.path) === pathArg ||
-              e.path === `/v1${pathArg.startsWith("/") ? pathArg : `/${pathArg}`}`,
+              e.path ===
+                `/v1${pathArg.startsWith("/") ? pathArg : `/${pathArg}`}`,
           );
           if (!match) {
             pushLog("error", `no endpoint: ${pathArg}`);
@@ -164,55 +165,74 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
           break;
         }
 
-        case "clear":
-          setLogs([]);
-          return;
-
         case "echo":
           pushLog("info", args.join(" ") || "");
           break;
 
         default:
-          pushLog(
-            "error",
-            `unknown: ${command}. type 'help'`,
-          );
+          pushLog("error", `unknown: ${command}. type 'help'`);
       }
     },
     [pushLog],
   );
 
+  /**
+   * Idle loop while the section is in view and the user is not focused:
+   *   3 random curls → clear command → wait → repeat
+   * Does not reseed the endpoint list after clear — screen stays empty until
+   * the next batch of commands (or until the section is left and re-entered).
+   */
   const scheduleIdleCycle = useCallback(() => {
     clearTimers();
-    if (focusedRef.current || hasInteractedRef.current) return;
+    if (!inViewRef.current || focusedRef.current || hasInteractedRef.current) {
+      return;
+    }
 
     const start = window.setTimeout(() => {
-      if (focusedRef.current || hasInteractedRef.current) return;
-      cycleActiveRef.current = true;
+      if (!inViewRef.current || focusedRef.current || hasInteractedRef.current) {
+        return;
+      }
 
       const picks = pickThree(endpointsRef.current);
       if (picks.length === 0) return;
 
       picks.forEach((ep, i) => {
         const t = window.setTimeout(() => {
-          if (focusedRef.current || hasInteractedRef.current) return;
+          if (
+            !inViewRef.current ||
+            focusedRef.current ||
+            hasInteractedRef.current
+          ) {
+            return;
+          }
           runCommand(`curl ${shortPath(ep.path)}`);
 
-          // After last command: clear, reseed welcome, loop
           if (i === picks.length - 1) {
+            // After the third command: run real `clear`, then loop
             const clearT = window.setTimeout(() => {
-              if (focusedRef.current || hasInteractedRef.current) return;
-              setLogs([]);
-              const reseed = window.setTimeout(() => {
-                if (focusedRef.current || hasInteractedRef.current) return;
-                seedWelcome();
-                // Reset interaction only for the idle loop so it can continue;
-                // focusedRef still gates when the user is in the terminal.
+              if (
+                !inViewRef.current ||
+                focusedRef.current ||
+                hasInteractedRef.current
+              ) {
+                return;
+              }
+              runCommand("clear");
+
+              const loopT = window.setTimeout(() => {
+                if (
+                  !inViewRef.current ||
+                  focusedRef.current ||
+                  hasInteractedRef.current
+                ) {
+                  return;
+                }
+                // Stay empty after clear — just fire the next batch
                 hasInteractedRef.current = false;
                 scheduleIdleCycle();
-              }, 400);
-              timersRef.current.push(reseed);
-            }, DEMO_LOOP_MS);
+              }, DEMO_LOOP_MS);
+              timersRef.current.push(loopT);
+            }, DEMO_STEP_MS);
             timersRef.current.push(clearT);
           }
         }, DEMO_STEP_MS * (i + 1));
@@ -221,9 +241,42 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
     }, IDLE_START_MS);
 
     timersRef.current.push(start);
-  }, [clearTimers, runCommand, seedWelcome]);
+  }, [clearTimers, runCommand]);
 
-  // Start idle cycle on mount; restart when focus leaves
+  // IntersectionObserver: when the user scrolls away and back, restore
+  // the original welcome + endpoints and restart the idle demo.
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const nowInView = entry.isIntersecting;
+        const wasInView = inViewRef.current;
+        inViewRef.current = nowInView;
+
+        if (!nowInView) {
+          // Left the section — stop demo
+          clearTimers();
+          return;
+        }
+
+        if (!wasInView && nowInView) {
+          // Re-entered: restore original state
+          hasInteractedRef.current = false;
+          focusedRef.current = false;
+          seedWelcome();
+          scheduleIdleCycle();
+        }
+      },
+      { threshold: 0.25 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [clearTimers, seedWelcome, scheduleIdleCycle]);
+
+  // Kick off idle cycle on mount
   useEffect(() => {
     scheduleIdleCycle();
     return () => clearTimers();
@@ -236,9 +289,8 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
 
   const onBlur = () => {
     focusedRef.current = false;
-    // Allow demo to resume after blur + idle
     hasInteractedRef.current = false;
-    scheduleIdleCycle();
+    if (inViewRef.current) scheduleIdleCycle();
   };
 
   const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
@@ -275,7 +327,7 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
   };
 
   return (
-    <div className="card overflow-hidden bg-ink !p-0">
+    <div ref={rootRef} className="card overflow-hidden bg-ink !p-0">
       {/* Terminal header */}
       <div className="flex items-center justify-between border-b border-paper/10 px-4 py-3">
         <div className="flex items-center gap-2">
