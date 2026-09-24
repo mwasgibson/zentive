@@ -1,87 +1,70 @@
 "use client";
 
 /**
- * Dark void tucked under the CTA button.
- * Black core + stretched star streaks (no orange).
+ * Void starts at the right edge of the CTA row and fills left toward the button.
+ * Dark mass + stretched rays pulling inward — not a floating circle in open space.
  */
 export function CtaVoid() {
-  // Fixed star positions — radial streaks that stretch outward from the core
-  const stars = [
-    { a: 12, r: 42, len: 18 },
-    { a: 38, r: 48, len: 22 },
-    { a: 55, r: 40, len: 14 },
-    { a: 78, r: 52, len: 26 },
-    { a: 105, r: 45, len: 16 },
-    { a: 130, r: 50, len: 20 },
-    { a: 155, r: 38, len: 12 },
-    { a: 178, r: 55, len: 24 },
-    { a: 200, r: 44, len: 18 },
-    { a: 225, r: 50, len: 22 },
-    { a: 250, r: 42, len: 15 },
-    { a: 275, r: 48, len: 20 },
-    { a: 300, r: 40, len: 14 },
-    { a: 325, r: 53, len: 25 },
-    { a: 25, r: 60, len: 10 },
-    { a: 95, r: 62, len: 12 },
-    { a: 165, r: 58, len: 11 },
-    { a: 240, r: 61, len: 13 },
-    { a: 310, r: 59, len: 10 },
+  // Rays stretch from the dense right core leftward toward the button
+  const rays = [
+    { y: 18, x1: 92, x2: 28, w: 1.2 },
+    { y: 28, x1: 95, x2: 18, w: 0.9 },
+    { y: 38, x1: 98, x2: 35, w: 1.4 },
+    { y: 48, x1: 100, x2: 12, w: 1.1 },
+    { y: 58, x1: 97, x2: 22, w: 0.8 },
+    { y: 68, x1: 99, x2: 30, w: 1.3 },
+    { y: 78, x1: 94, x2: 15, w: 1.0 },
+    { y: 88, x1: 96, x2: 40, w: 0.85 },
+    { y: 12, x1: 90, x2: 45, w: 0.7 },
+    { y: 95, x1: 93, x2: 38, w: 0.75 },
   ];
-
-  const cx = 100;
-  const cy = 100;
 
   return (
     <div className="cta-void" aria-hidden>
       <svg
         className="cta-void__svg"
-        viewBox="0 0 200 200"
-        preserveAspectRatio="xMidYMid meet"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
       >
         <defs>
-          <radialGradient id="void-core" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#000000" stopOpacity="1" />
-            <stop offset="55%" stopColor="#0a0a0a" stopOpacity="0.95" />
-            <stop offset="78%" stopColor="#141414" stopOpacity="0.35" />
+          {/* Dense at the right edge, fades as it reaches left (toward button) */}
+          <linearGradient id="void-fill" x1="100%" y1="50%" x2="0%" y2="50%">
+            <stop offset="0%" stopColor="#050505" stopOpacity="0.95" />
+            <stop offset="35%" stopColor="#0a0a0a" stopOpacity="0.7" />
+            <stop offset="65%" stopColor="#141414" stopOpacity="0.28" />
             <stop offset="100%" stopColor="#141414" stopOpacity="0" />
-          </radialGradient>
-          <radialGradient id="void-rim" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
-            <stop offset="62%" stopColor="#ffffff" stopOpacity="0" />
-            <stop offset="70%" stopColor="#ffffff" stopOpacity="0.18" />
-            <stop offset="78%" stopColor="#ffffff" stopOpacity="0" />
+          </linearGradient>
+
+          <radialGradient id="void-core" cx="92%" cy="50%" r="45%">
+            <stop offset="0%" stopColor="#000000" stopOpacity="1" />
+            <stop offset="40%" stopColor="#0a0a0a" stopOpacity="0.85" />
+            <stop offset="75%" stopColor="#141414" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#141414" stopOpacity="0" />
           </radialGradient>
         </defs>
 
-        {/* Soft dark pull */}
-        <circle cx={cx} cy={cy} r="88" fill="url(#void-core)" />
+        {/* Mass filling from the right */}
+        <rect x="0" y="0" width="100" height="100" fill="url(#void-fill)" />
+        <ellipse cx="88" cy="50" rx="28" ry="42" fill="url(#void-core)" />
 
-        {/* Stretched stars — lines from near-core outward */}
-        {stars.map((s, i) => {
-          const rad = (s.a * Math.PI) / 180;
-          const x1 = cx + Math.cos(rad) * s.r;
-          const y1 = cy + Math.sin(rad) * s.r;
-          const x2 = cx + Math.cos(rad) * (s.r + s.len);
-          const y2 = cy + Math.sin(rad) * (s.r + s.len);
-          return (
-            <line
-              key={i}
-              className="cta-void__star"
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
-              stroke="rgba(20,20,20,0.45)"
-              strokeWidth={i % 3 === 0 ? 1.2 : 0.7}
-              strokeLinecap="round"
-              style={{ animationDelay: `${(i % 7) * 0.35}s` }}
-            />
-          );
-        })}
+        {/* Stretched rays pulling left toward the button */}
+        {rays.map((r, i) => (
+          <line
+            key={i}
+            className="cta-void__ray"
+            x1={r.x1}
+            y1={r.y}
+            x2={r.x2}
+            y2={r.y + (i % 2 === 0 ? -2 : 2)}
+            stroke="rgba(20,20,20,0.55)"
+            strokeWidth={r.w}
+            strokeLinecap="round"
+            style={{ animationDelay: `${(i % 5) * 0.4}s` }}
+          />
+        ))}
 
-        {/* Thin rim */}
-        <circle cx={cx} cy={cy} r="32" fill="url(#void-rim)" />
-        <circle cx={cx} cy={cy} r="28" fill="#050505" />
+        {/* Hard core at the far right edge */}
+        <ellipse cx="96" cy="50" rx="8" ry="18" fill="#000" />
       </svg>
     </div>
   );

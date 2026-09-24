@@ -1,24 +1,20 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 
 type Phase = "letter" | "fold" | "envelope" | "plane" | "fly" | "gone";
 
 /**
- * Letter (name, email, question) → fold → envelope → plane → fly.
- * Mailto fires immediately on submit so the mail client always opens.
- * Scroll fly-off watches the whole #faq section — not the letter alone —
- * so scrolling through the FAQ accordion does not trigger it.
+ * Letter → fold → envelope → plane → fly.
+ * Animation runs only on Send. Mailto opens on submit.
  */
 export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [question, setQuestion] = useState("");
   const [phase, setPhase] = useState<Phase>("letter");
-  const rootRef = useRef<HTMLDivElement>(null);
   const timersRef = useRef<number[]>([]);
   const busyRef = useRef(false);
-  const wasInFaqRef = useRef(false);
 
   function clearTimers() {
     timersRef.current.forEach((id) => window.clearTimeout(id));
@@ -45,44 +41,6 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
       }, 4500),
     );
   }
-
-  useEffect(() => {
-    // Observe the full FAQ section, not the letter slot.
-    // The letter sits in the left column and leaves the viewport while
-    // the user is still reading the accordion — that must not fire.
-    const section =
-      document.getElementById("faq") ?? rootRef.current?.closest("section");
-    if (!section) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          wasInFaqRef.current = true;
-          return;
-        }
-
-        // Only after the user had the FAQ on screen, then left it entirely
-        // by scrolling past (section is above the viewport).
-        if (
-          wasInFaqRef.current &&
-          !entry.isIntersecting &&
-          entry.boundingClientRect.bottom < 0 &&
-          !busyRef.current
-        ) {
-          wasInFaqRef.current = false;
-          runVisualSequence();
-        }
-      },
-      { threshold: 0, rootMargin: "0px" },
-    );
-
-    observer.observe(section);
-    return () => {
-      observer.disconnect();
-      clearTimers();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -113,7 +71,7 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
     question.trim().length > 0;
 
   return (
-    <div ref={rootRef} className="faq-letter-slot">
+    <div className="faq-letter-slot">
       <div className={`faq-mail faq-mail--${phase}`}>
         <div
           className="faq-letter"
