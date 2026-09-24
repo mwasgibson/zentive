@@ -1,6 +1,7 @@
 import { RouteDiagram } from "@/components/RouteDiagram";
 import { PlatformTabs } from "@/components/PlatformTabs";
 import { FaqItem } from "@/components/FaqItem";
+import { FaqEnvelope } from "@/components/FaqEnvelope";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SecurityIcon } from "@/components/Securityicon";
@@ -113,11 +114,17 @@ export default async function HomePage() {
             id="platform"
             className="border-t border-border bg-surface py-20"
           >
-            <div className="section">
+            <div className="section platform-stage">
+              <span className="platform-stage__falloff" aria-hidden />
+              <span className="platform-stage__wordmark" aria-hidden>
+                {siteConfig.productName}
+              </span>
               <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                 {page.features.heading}
               </h2>
-              <PlatformTabs groups={page.features.groups} />
+              <div className="platform-panel-falloff">
+                <PlatformTabs groups={page.features.groups} />
+              </div>
             </div>
           </section>
         </Reveal>
@@ -361,7 +368,7 @@ export default async function HomePage() {
                   Straight answers, before you talk to us.
                 </h2>
                 <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
-                  Don&apos;t see your question here? Reach us directly at{" "}
+                  Don't see your question here? Reach us directly at{" "}
                   <a
                     href={`mailto:${siteConfig.contactEmail}`}
                     className="text-ink underline"
@@ -370,6 +377,7 @@ export default async function HomePage() {
                   </a>
                   .
                 </p>
+                <FaqEnvelope contactEmail={siteConfig.contactEmail} />
               </div>
               <div>
                 {faqs.map((f) => (
@@ -383,8 +391,8 @@ export default async function HomePage() {
         {/* FINAL CTA */}
         <Reveal>
           <section className="border-t border-border bg-surface py-20">
-            <div className="section flex flex-col items-start gap-8 lg:flex-row lg:items-center">
-              <div>
+            <div className="section cta-row flex flex-col items-start gap-8 lg:flex-row lg:items-center">
+              <div className="relative z-[1]">
                 <h2 className="max-w-xl text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                   {page.final_cta.headline}
                 </h2>
@@ -392,20 +400,31 @@ export default async function HomePage() {
                   {page.final_cta.body}
                 </p>
               </div>
-              <Magnetic bounds="section">
-                <a
-                  href={`mailto:${siteConfig.contactEmail}`}
-                  className="btn-primary group shrink-0"
-                >
-                  <span>{page.final_cta.cta_label}</span>
-                  <span
-                    aria-hidden
-                    className="inline-block transition-transform duration-200 group-hover:translate-x-0.5"
+              <div className="cta-resist relative z-[1]">
+                <Magnetic bounds="section">
+                  <a
+                    href={`mailto:${siteConfig.contactEmail}`}
+                    className="btn-primary group shrink-0"
                   >
-                    →
-                  </span>
-                </a>
-              </Magnetic>
+                    <span>{page.final_cta.cta_label}</span>
+                    <span
+                      aria-hidden
+                      className="inline-block transition-transform duration-200 group-hover:translate-x-0.5"
+                    >
+                      →
+                    </span>
+                  </a>
+                </Magnetic>
+              </div>
+              {/* Void sits after the button on wide screens */}
+              <div className="cta-void" aria-hidden>
+                <div className="cta-void__core" />
+                <div className="cta-void__rim" />
+                <span className="cta-void__speck" />
+                <span className="cta-void__speck" />
+                <span className="cta-void__speck" />
+                <span className="cta-void__speck" />
+              </div>
             </div>
           </section>
         </Reveal>
