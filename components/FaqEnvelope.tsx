@@ -7,6 +7,8 @@ type Phase = "letter" | "fold" | "envelope" | "plane" | "fly" | "gone";
 /**
  * Letter (name, email, question) → fold → envelope → plane → fly.
  * Mailto fires immediately on submit so the mail client always opens.
+ * Scroll fly-off watches the whole #faq section — not the letter alone —
+ * so scrolling through the FAQ accordion does not trigger it.
  */
 export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
   const [name, setName] = useState("");
@@ -16,6 +18,7 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const timersRef = useRef<number[]>([]);
   const busyRef = useRef(false);
+  const wasInFaqRef = useRef(false);
 
   function clearTimers() {
     timersRef.current.forEach((id) => window.clearTimeout(id));
@@ -27,7 +30,6 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
     busyRef.current = true;
     clearTimers();
 
-    // Timings match the longer CSS keyframes so each stage is readable
     setPhase("fold");
     timersRef.current.push(window.setTimeout(() => setPhase("envelope"), 720));
     timersRef.current.push(window.setTimeout(() => setPhase("plane"), 1450));
@@ -45,23 +47,36 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
   }
 
   useEffect(() => {
-    const el = rootRef.current;
-    if (!el) return;
+    // Observe the full FAQ section, not the letter slot.
+    // The letter sits in the left column and leaves the viewport while
+    // the user is still reading the accordion — that must not fire.
+    const section =
+      document.getElementById("faq") ?? rootRef.current?.closest("section");
+    if (!section) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
+        if (entry.isIntersecting) {
+          wasInFaqRef.current = true;
+          return;
+        }
+
+        // Only after the user had the FAQ on screen, then left it entirely
+        // by scrolling past (section is above the viewport).
         if (
+          wasInFaqRef.current &&
           !entry.isIntersecting &&
-          entry.boundingClientRect.top < 0 &&
+          entry.boundingClientRect.bottom < 0 &&
           !busyRef.current
         ) {
+          wasInFaqRef.current = false;
           runVisualSequence();
         }
       },
-      { threshold: 0.1 },
+      { threshold: 0, rootMargin: "0px" },
     );
 
-    observer.observe(el);
+    observer.observe(section);
     return () => {
       observer.disconnect();
       clearTimers();
