@@ -56,7 +56,7 @@
   }
 }
 
-/* --- FAQ letter (larger, clearer stages) --- */
+/* --- FAQ letter (3D tilt + raised sheet) --- */
 .faq-letter-slot {
   position: relative;
   margin-top: 2.25rem;
@@ -72,10 +72,15 @@
   min-height: 20rem;
 }
 
+.faq-letter-tilt {
+  width: 100%;
+  transform-style: preserve-3d;
+}
+
 .faq-letter {
   position: relative;
   z-index: 2;
-  border: 1.5px solid rgba(20, 20, 20, 0.14);
+  border: 1.5px solid rgba(20, 20, 20, 0.12);
   background:
     repeating-linear-gradient(
       to bottom,
@@ -90,12 +95,33 @@
     100% 100%;
   border-radius: 0.2rem 0.2rem 0.6rem 0.6rem;
   padding: 1.4rem 1.35rem 1.25rem;
+  /* Layered depth — reads as a raised sheet */
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.85) inset,
-    0 18px 36px -14px rgba(20, 20, 20, 0.22),
-    0 6px 12px -6px rgba(20, 20, 20, 0.08);
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 -1px 0 rgba(20, 20, 20, 0.04) inset,
+    1px 0 0 rgba(255, 255, 255, 0.5) inset,
+    -1px 0 0 rgba(20, 20, 20, 0.04) inset,
+    0 2px 3px rgba(20, 20, 20, 0.04),
+    0 8px 16px -6px rgba(20, 20, 20, 0.12),
+    0 20px 40px -14px rgba(20, 20, 20, 0.2),
+    0 36px 64px -24px rgba(20, 20, 20, 0.14);
   transform-origin: center top;
   transform-style: preserve-3d;
+}
+
+/* Bright edge highlight along the top-left */
+.faq-letter__edge {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.12) 28%,
+    transparent 52%
+  );
+  mix-blend-mode: soft-light;
 }
 
 .faq-letter__crease {
@@ -105,9 +131,12 @@
   top: 0;
   height: 2px;
   background: rgba(20, 20, 20, 0.1);
+  z-index: 1;
 }
 
 .faq-letter__label {
+  position: relative;
+  z-index: 1;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.7rem;
   letter-spacing: 0.16em;
@@ -117,6 +146,8 @@
 }
 
 .faq-letter__form {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
@@ -197,9 +228,6 @@
   0% {
     transform: scaleY(1) rotateX(0deg) translateY(0);
     opacity: 1;
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.85) inset,
-      0 18px 36px -14px rgba(20, 20, 20, 0.22);
   }
   40% {
     transform: scaleY(0.55) rotateX(35deg) translateY(8%);
