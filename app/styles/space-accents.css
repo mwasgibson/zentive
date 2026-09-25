@@ -56,24 +56,20 @@
   }
 }
 
-/* --- FAQ letter (3D tilt + raised sheet) --- */
+/* --- FAQ letter: static 3D (same language as feature/glossary cards) --- */
 .faq-letter-slot {
   position: relative;
   margin-top: 2.25rem;
   min-height: 20rem;
   max-width: 28rem;
   width: 100%;
-  perspective: 1200px;
+  perspective: 900px;
 }
 
 .faq-mail {
   position: relative;
   width: 100%;
   min-height: 20rem;
-}
-
-.faq-letter-tilt {
-  width: 100%;
   transform-style: preserve-3d;
 }
 
@@ -89,27 +85,44 @@
       rgba(20, 112, 111, 0.08) 1.7rem,
       rgba(20, 112, 111, 0.08) calc(1.7rem + 1px)
     ),
-    linear-gradient(165deg, #fbf9f4 0%, #f0ebe3 100%);
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      #fbf9f4 35%,
+      #f0ebe3 100%
+    );
   background-size:
     100% 1.75rem,
     100% 100%;
-  border-radius: 0.2rem 0.2rem 0.6rem 0.6rem;
+  border-radius: 0.35rem 0.35rem 0.75rem 0.75rem;
   padding: 1.4rem 1.35rem 1.25rem;
-  /* Layered depth — reads as a raised sheet */
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.95) inset,
-    0 -1px 0 rgba(20, 20, 20, 0.04) inset,
-    1px 0 0 rgba(255, 255, 255, 0.5) inset,
-    -1px 0 0 rgba(20, 20, 20, 0.04) inset,
-    0 2px 3px rgba(20, 20, 20, 0.04),
-    0 8px 16px -6px rgba(20, 20, 20, 0.12),
-    0 20px 40px -14px rgba(20, 20, 20, 0.2),
-    0 36px 64px -24px rgba(20, 20, 20, 0.14);
-  transform-origin: center top;
+  /* Fixed perspective — sits like the RouteDiagram / feature panel card */
+  transform: perspective(900px) rotateX(5deg) rotateY(-4deg) translateZ(0);
+  transform-origin: center center;
   transform-style: preserve-3d;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 -1px 0 rgba(20, 20, 20, 0.05) inset,
+    0 2px 4px rgba(20, 20, 20, 0.04),
+    0 12px 28px -12px rgba(20, 20, 20, 0.16),
+    0 28px 48px -20px rgba(20, 20, 20, 0.12);
 }
 
-/* Bright edge highlight along the top-left */
+/* Thickness slab behind the face (extruded card edge) */
+.faq-letter__thickness {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(160deg, #e4e0d8 0%, #d0cabd 100%);
+  transform: translate3d(6px, 8px, -12px);
+  z-index: -1;
+  pointer-events: none;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.25) inset,
+    0 10px 20px -8px rgba(20, 20, 20, 0.18);
+}
+
+/* Soft face highlight */
 .faq-letter__edge {
   position: absolute;
   inset: 0;
@@ -117,9 +130,9 @@
   pointer-events: none;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.55) 0%,
-    rgba(255, 255, 255, 0.12) 28%,
-    transparent 52%
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.1) 30%,
+    transparent 55%
   );
   mix-blend-mode: soft-light;
 }
@@ -212,6 +225,7 @@
   cursor: not-allowed;
 }
 
+/* Fold resets static 3D so the fold animation owns transform */
 .faq-mail--fold .faq-letter {
   animation: letter-fold 700ms cubic-bezier(0.45, 0, 0.2, 1) forwards;
 }
@@ -226,19 +240,23 @@
 
 @keyframes letter-fold {
   0% {
-    transform: scaleY(1) rotateX(0deg) translateY(0);
+    transform: perspective(900px) rotateX(5deg) rotateY(-4deg) scaleY(1)
+      translateY(0);
     opacity: 1;
   }
   40% {
-    transform: scaleY(0.55) rotateX(35deg) translateY(8%);
+    transform: perspective(900px) rotateX(35deg) rotateY(-2deg) scaleY(0.55)
+      translateY(8%);
     opacity: 1;
   }
   75% {
-    transform: scaleY(0.2) rotateX(70deg) translateY(18%);
+    transform: perspective(900px) rotateX(70deg) rotateY(0deg) scaleY(0.2)
+      translateY(18%);
     opacity: 0.75;
   }
   100% {
-    transform: scaleY(0.05) rotateX(88deg) translateY(28%);
+    transform: perspective(900px) rotateX(88deg) rotateY(0deg) scaleY(0.05)
+      translateY(28%);
     opacity: 0;
   }
 }
@@ -482,5 +500,13 @@
   .faq-mail--plane .faq-plane,
   .faq-mail--fly .faq-plane {
     animation: none !important;
+  }
+
+  .faq-letter {
+    transform: none;
+  }
+
+  .faq-letter__thickness {
+    display: none;
   }
 }
