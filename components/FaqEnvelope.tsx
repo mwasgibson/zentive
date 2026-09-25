@@ -1,12 +1,14 @@
 "use client";
 
 import { FormEvent, useRef, useState } from "react";
+import { TiltCard } from "@/components/TiltCard";
 
 type Phase = "letter" | "fold" | "envelope" | "plane" | "fly" | "gone";
 
 /**
  * Letter → fold → envelope → plane → fly.
  * Animation runs only on Send. Mailto opens on submit.
+ * Idle letter has 3D tilt + raised-sheet depth.
  */
 export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
   const [name, setName] = useState("");
@@ -70,57 +72,69 @@ export function FaqEnvelope({ contactEmail }: { contactEmail: string }) {
     email.trim().length > 0 &&
     question.trim().length > 0;
 
+  const letterVisible = phase === "letter" || phase === "fold";
+  const tiltActive = phase === "letter";
+
   return (
     <div className="faq-letter-slot">
       <div className={`faq-mail faq-mail--${phase}`}>
-        <div
-          className="faq-letter"
-          style={{
-            visibility:
-              phase === "letter" || phase === "fold" ? "visible" : "hidden",
-            pointerEvents: phase === "letter" ? "auto" : "none",
-          }}
+        <TiltCard
+          maxTilt={tiltActive ? 10 : 0}
+          className="faq-letter-tilt"
         >
-          <div className="faq-letter__crease" aria-hidden />
-          <p className="faq-letter__label">Write to us</p>
-          <form className="faq-letter__form" onSubmit={onSubmit}>
-            <input
-              className="faq-letter__field"
-              type="text"
-              name="name"
-              autoComplete="name"
-              placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={phase !== "letter"}
-              required
-            />
-            <input
-              className="faq-letter__field"
-              type="email"
-              name="email"
-              autoComplete="email"
-              placeholder="Your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={phase !== "letter"}
-              required
-            />
-            <textarea
-              className="faq-letter__input"
-              name="question"
-              rows={4}
-              placeholder="Your question…"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              disabled={phase !== "letter"}
-              required
-            />
-            <button type="submit" className="faq-letter__send" disabled={!canSend}>
-              Send
-            </button>
-          </form>
-        </div>
+          <div
+            className="faq-letter"
+            style={{
+              visibility: letterVisible ? "visible" : "hidden",
+              pointerEvents: phase === "letter" ? "auto" : "none",
+            }}
+          >
+            <div className="faq-letter__edge" aria-hidden />
+            <div className="faq-letter__crease" aria-hidden />
+            <p className="faq-letter__label">Write to us</p>
+            <form className="faq-letter__form" onSubmit={onSubmit}>
+              <input
+                className="faq-letter__field"
+                type="text"
+                name="name"
+                autoComplete="name"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={phase !== "letter"}
+                required
+              />
+              <input
+                className="faq-letter__field"
+                type="email"
+                name="email"
+                autoComplete="email"
+                placeholder="Your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={phase !== "letter"}
+                required
+              />
+              <textarea
+                className="faq-letter__input"
+                name="question"
+                rows={4}
+                placeholder="Your question…"
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                disabled={phase !== "letter"}
+                required
+              />
+              <button
+                type="submit"
+                className="faq-letter__send"
+                disabled={!canSend}
+              >
+                Send
+              </button>
+            </form>
+          </div>
+        </TiltCard>
 
         <div
           className="faq-mail-envelope"
