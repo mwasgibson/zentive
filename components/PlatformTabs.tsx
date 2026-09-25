@@ -8,21 +8,15 @@ import {
   BarChart3,
   Code2,
   RefreshCw,
-  Check,
   type LucideIcon,
 } from "lucide-react";
+import { TiltCard } from "@/components/TiltCard";
 
 type FeatureGroup = {
   category: string;
   items: string[];
 };
 
-/**
- * Purely a display concern — the CMS schema for features.groups has no
- * icon field, so this maps by category label instead. Falls back to a
- * generic icon for any category name an editor renames or adds that
- * isn't in the map, same defensive pattern as SecurityIcon.
- */
 const CATEGORY_ICON_MAP: Record<string, LucideIcon> = {
   "Core messaging": MessageSquare,
   "Compliance & trust": ShieldCheck,
@@ -32,10 +26,16 @@ const CATEGORY_ICON_MAP: Record<string, LucideIcon> = {
   Reliability: RefreshCw,
 };
 
+const CATEGORY_ICON_ANIM: Record<string, string> = {
+  "Core messaging": "icon-msg",
+  "Compliance & trust": "icon-shield",
+  "Account & billing": "icon-wallet",
+  "Reporting & analytics": "icon-chart",
+  "Developer tools": "icon-code",
+  Reliability: "icon-refresh",
+};
+
 const AUTO_ADVANCE_MS = 5000;
-// How long a manual click pauses auto-play before it picks back up.
-// Longer than AUTO_ADVANCE_MS on purpose — a click should read as a
-// real break, not just line up with the next scheduled tick.
 const MANUAL_PAUSE_MS = 2000;
 
 export function PlatformTabs({ groups }: { groups: FeatureGroup[] }) {
@@ -53,16 +53,12 @@ export function PlatformTabs({ groups }: { groups: FeatureGroup[] }) {
   const running =
     autoAdvancing && !interactionPaused && !tabHidden && !manualPauseActive;
 
-  // Clear any pending resume timer on unmount so it doesn't fire against
-  // an unmounted component.
   useEffect(() => {
     return () => {
       if (resumeTimerRef.current) window.clearTimeout(resumeTimerRef.current);
     };
   }, []);
 
-  // Respect the person's motion preference — if they've asked for less
-  // motion, this never auto-plays at all rather than just playing quieter.
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mq.matches);
@@ -71,7 +67,6 @@ export function PlatformTabs({ groups }: { groups: FeatureGroup[] }) {
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  // Don't burn a timer in a background tab nobody's looking at.
   useEffect(() => {
     function onVisibility() {
       setTabHidden(document.hidden);
@@ -89,10 +84,6 @@ export function PlatformTabs({ groups }: { groups: FeatureGroup[] }) {
   }, [activeIndex, running, groups.length]);
 
   function selectTab(index: number, focus = false) {
-    // A deliberate click gets a longer, quiet window before auto-play
-    // picks back up — long enough to read what they clicked for,
-    // not a permanent handoff. Re-clicking resets the window rather
-    // than stacking a second resume on top of the first.
     setActiveIndex(index);
     setManualPauseActive(true);
     if (resumeTimerRef.current) window.clearTimeout(resumeTimerRef.current);
@@ -126,7 +117,7 @@ export function PlatformTabs({ groups }: { groups: FeatureGroup[] }) {
   }
 
   return (
-    <div className="mt-12 grid gap-8 lg:grid-cols-[280px_1fr]">
+    <div className="mt-12 grid gap-8 lg:grid-cols-[280px_1fr] max-w-5xl">
       <div
         role="tablist"
         aria-label="Platform feature categories"
@@ -142,6 +133,7 @@ export function PlatformTabs({ groups }: { groups: FeatureGroup[] }) {
       >
         {groups.map((group, i) => {
           const Icon = CATEGORY_ICON_MAP[group.category] ?? MessageSquare;
+          const iconAnim = CATEGORY_ICON_ANIM[group.category] ?? "icon-msg";
           const isActive = i === activeIndex;
           return (
             <button
@@ -158,28 +150,24 @@ export function PlatformTabs({ groups }: { groups: FeatureGroup[] }) {
               onClick={() => selectTab(i)}
               onKeyDown={(e) => onKeyDown(e, i)}
               className={[
-                "relative flex shrink-0 items-center gap-3 overflow-hidden whitespace-nowrap rounded-lg border px-4 py-3 text-left text-sm transition-colors lg:w-full",
+                "platform-tab relative flex shrink-0 items-center gap-3 overflow-hidden whitespace-nowrap rounded-lg border px-4 py-3 text-left text-sm transition-colors lg:w-full",
                 isActive
                   ? "border-signal-dark/30 bg-wire-light text-ink"
                   : "border-transparent text-muted hover:bg-surface hover:text-ink",
               ].join(" ")}
             >
-              <Icon
-                aria-hidden
-                size={18}
-                className={
-                  isActive ? "shrink-0 text-signal-dark" : "shrink-0 text-muted"
-                }
-              />
+              <span
+                className={[
+                  "platform-tab-icon shrink-0",
+                  iconAnim,
+                  isActive ? "is-active text-signal-dark" : "text-muted",
+                ].join(" ")}
+              >
+                <Icon aria-hidden size={18} />
+              </span>
               <span className="font-display font-semibold">
                 {group.category}
               </span>
-              <span
-                className={[
-                  "ml-auto shrink-0 font-mono text-[11px]",
-                  isActive ? "text-signal-dark" : "text-muted/70",
-                ].join(" ")}
-              ></span>
               {isActive && autoAdvancing && (
                 <span
                   key={activeIndex}
@@ -196,27 +184,29 @@ export function PlatformTabs({ groups }: { groups: FeatureGroup[] }) {
         })}
       </div>
 
-      <div
-        key={activeIndex}
-        id={`${baseId}-panel-${activeIndex}`}
-        role="tabpanel"
-        aria-labelledby={`${baseId}-tab-${activeIndex}`}
-        tabIndex={0}
-        className="card reveal-stagger is-visible"
-      >
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {active.items.map((item) => (
-            <li key={item} className="flex gap-2.5 text-sm text-muted">
-              <Check
-                aria-hidden
-                size={16}
-                className="mt-0.5 shrink-0 text-wire"
-              />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <TiltCard maxTilt={5} className="feature-panel-3d h-fit">
+        <div
+          key={activeIndex}
+          id={`${baseId}-panel-${activeIndex}`}
+          role="tabpanel"
+          aria-labelledby={`${baseId}-tab-${activeIndex}`}
+          tabIndex={0}
+          className="card feature-panel"
+        >
+          <ul className="grid gap-2.5 sm:grid-cols-2">
+            {active.items.map((item, i) => (
+              <li
+                key={item}
+                className="feature-chip"
+                style={{ animationDelay: `${60 + i * 55}ms` }}
+              >
+                <span className="feature-chip-dot" aria-hidden />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </TiltCard>
     </div>
   );
 }

@@ -1,54 +1,121 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const STATUSES = ["Queued", "Sending", "Sent", "Delivered", "Failed"] as const;
 
-const STATUS_FIELDS = [
-  { x: "6%", y: "18%", delay: 0, color: "wire", phase: 0 },
-  { x: "88%", y: "12%", delay: 1400, color: "signal-dark", phase: 3 },
-  { x: "94%", y: "58%", delay: 2800, color: "wire", phase: 1 },
-  { x: "12%", y: "78%", delay: 700, color: "signal-dark", phase: 4 },
-  { x: "72%", y: "84%", delay: 2100, color: "wire", phase: 2 },
-  { x: "38%", y: "8%", delay: 3500, color: "signal-dark", phase: 0 },
-  { x: "58%", y: "94%", delay: 300, color: "wire", phase: 3 },
-  { x: "22%", y: "42%", delay: 2500, color: "signal-dark", phase: 1 },
+/** Visual variants so bubbles don’t all look the same */
+const BUBBLE_VARIANTS = [
+  "bubble-a", // ink fill, paper text, tail bottom-left
+  "bubble-b", // paper fill, border, tail bottom-right
+  "bubble-c", // signal tint fill, tail bottom-left
+  "bubble-d", // wire tint fill, tail bottom-right
+  "bubble-e", // outline only, tail top-left
 ] as const;
 
-const COLOR_CLASS = {
-  wire: "text-wire",
-  "signal-dark": "text-signal-dark",
-} as const;
+type Particle = {
+  id: number;
+  x: number;
+  y: number;
+  label: (typeof STATUSES)[number];
+  variant: (typeof BUBBLE_VARIANTS)[number];
+};
+
+function makeParticle(id: number, x: number, y: number): Particle {
+  return {
+    id,
+    x,
+    y,
+    label: STATUSES[Math.floor(Math.random() * STATUSES.length)],
+    variant: BUBBLE_VARIANTS[Math.floor(Math.random() * BUBBLE_VARIANTS.length)],
+  };
+}
+
+function randomPosition(): { x: number; y: number } {
+  return {
+    x: 4 + Math.random() * 88,
+    y: 6 + Math.random() * 84,
+  };
+}
+
+const LIFE_MS = 4200;
+const SPAWN_MS = 850;
+
+const INTERACTIVE =
+  'a, button, input, textarea, select, summary, [role="button"], [data-no-spawn]';
 
 export function DeliveryField() {
-  const [statusIndex, setStatusIndex] = useState(0);
+  const [items, setItems] = useState<Particle[]>([]);
+  const nextId = useRef(0);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  const spawnAt = useCallback((x: number, y: number) => {
+    const id = ++nextId.current;
+    const cx = Math.min(94, Math.max(2, x));
+    const cy = Math.min(94, Math.max(2, y));
+    setItems((prev) => [...prev, makeParticle(id, cx, cy)].slice(-14));
+    window.setTimeout(() => {
+      setItems((prev) => prev.filter((p) => p.id !== id));
+    }, LIFE_MS);
+  }, []);
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      setStatusIndex((current) => (current + 1) % STATUSES.length);
-    }, 2200); // slower cycle: ~2.2s per status
+    const spawn = () => {
+      const { x, y } = randomPosition();
+      spawnAt(x, y);
+    };
 
-    return () => window.clearInterval(timer);
-  }, []);
+    spawn();
+    const t1 = window.setTimeout(spawn, 200);
+    const t2 = window.setTimeout(spawn, 450);
+    const interval = window.setInterval(spawn, SPAWN_MS);
+
+    return () => {
+      window.clearInterval(interval);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
+  }, [spawnAt]);
+
+  useEffect(() => {
+    const field = rootRef.current;
+    const section = field?.parentElement;
+    if (!section) return;
+
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      if (target.closest(INTERACTIVE)) return;
+      if (target.closest(".card")) return;
+
+      const rect = section.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      spawnAt(x, y);
+    };
+
+    section.addEventListener("pointerdown", onPointerDown);
+    return () => section.removeEventListener("pointerdown", onPointerDown);
+  }, [spawnAt]);
 
   return (
     <div
+      ref={rootRef}
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 overflow-hidden"
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none"
     >
-      {STATUS_FIELDS.map((field) => (
+      {items.map((item) => (
         <span
-          key={`${field.x}-${field.y}`}
-          className={`delivery-status ${COLOR_CLASS[field.color]}`}
-          style={
-            {
-              left: field.x,
-              top: field.y,
-              "--delivery-delay": `${field.delay}ms`,
-            } as React.CSSProperties
-          }
+          key={item.id}
+          className={`delivery-bubble ${item.variant}`}
+          style={{
+            left: `${item.x}%`,
+            top: `${item.y}%`,
+          }}
         >
-          {STATUSES[(statusIndex + field.phase) % STATUSES.length]}
+          <span className="delivery-bubble-text">{item.label}</span>
         </span>
       ))}
     </div>

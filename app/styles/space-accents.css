@@ -1,0 +1,512 @@
+/* =========================================================
+   SPACE ACCENTS — platform falloff, FAQ letter, CTA void
+   ========================================================= */
+
+/* --- Platform: light falloff (restored from c5d12d7) ---
+*/
+.platform-stage {
+  position: relative;
+}
+
+.platform-stage__falloff {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .platform-stage__falloff {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: min(100%, 64rem);
+    width: 12rem;
+    pointer-events: none;
+    background: linear-gradient(
+      to right,
+      rgba(20, 20, 20, 0.06),
+      transparent 70%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      #000 20%,
+      #000 80%,
+      transparent
+    );
+  }
+}
+
+.platform-panel-falloff {
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  .platform-panel-falloff::after {
+    content: "";
+    position: absolute;
+    top: 8%;
+    bottom: 8%;
+    right: -1.5rem;
+    width: 2.5rem;
+    pointer-events: none;
+    background: linear-gradient(to right, rgba(20, 20, 20, 0.1), transparent);
+    border-radius: 0 1rem 1rem 0;
+    filter: blur(8px);
+  }
+}
+
+/* --- FAQ letter: static 3D (same language as feature/glossary cards) --- */
+.faq-letter-slot {
+  position: relative;
+  margin-top: 2.25rem;
+  min-height: 20rem;
+  max-width: 28rem;
+  width: 100%;
+  perspective: 900px;
+}
+
+.faq-mail {
+  position: relative;
+  width: 100%;
+  min-height: 20rem;
+  transform-style: preserve-3d;
+}
+
+.faq-letter {
+  position: relative;
+  z-index: 2;
+  border: 1.5px solid rgba(20, 20, 20, 0.12);
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 1.7rem,
+      rgba(20, 112, 111, 0.08) 1.7rem,
+      rgba(20, 112, 111, 0.08) calc(1.7rem + 1px)
+    ),
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      #fbf9f4 35%,
+      #f0ebe3 100%
+    );
+  background-size:
+    100% 1.75rem,
+    100% 100%;
+  border-radius: 0.35rem 0.35rem 0.75rem 0.75rem;
+  padding: 1.4rem 1.35rem 1.25rem;
+  /* Fixed perspective — sits like the RouteDiagram / feature panel card */
+  transform: perspective(900px) rotateX(5deg) rotateY(-4deg) translateZ(0);
+  transform-origin: center center;
+  transform-style: preserve-3d;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 -1px 0 rgba(20, 20, 20, 0.05) inset,
+    0 2px 4px rgba(20, 20, 20, 0.04),
+    0 12px 28px -12px rgba(20, 20, 20, 0.16),
+    0 28px 48px -20px rgba(20, 20, 20, 0.12);
+}
+
+/* Thickness slab behind the face (extruded card edge) */
+.faq-letter__thickness {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(160deg, #e4e0d8 0%, #d0cabd 100%);
+  transform: translate3d(6px, 8px, -12px);
+  z-index: -1;
+  pointer-events: none;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.25) inset,
+    0 10px 20px -8px rgba(20, 20, 20, 0.18);
+}
+
+/* Soft face highlight */
+.faq-letter__edge {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.1) 30%,
+    transparent 55%
+  );
+  mix-blend-mode: soft-light;
+}
+
+.faq-letter__crease {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 0;
+  height: 2px;
+  background: rgba(20, 20, 20, 0.1);
+  z-index: 1;
+}
+
+.faq-letter__label {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 0.7rem;
+}
+
+.faq-letter__form {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.faq-letter__field {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid rgba(20, 20, 20, 0.14);
+  background: transparent;
+  padding: 0.5rem 0;
+  font-size: 1rem;
+  color: #141414;
+  outline: none;
+}
+
+.faq-letter__field:focus {
+  border-bottom-color: rgba(226, 113, 29, 0.55);
+}
+
+.faq-letter__field::placeholder {
+  color: #9ca3af;
+}
+
+.faq-letter__input {
+  width: 100%;
+  min-height: 5.5rem;
+  resize: none;
+  border: none;
+  background: transparent;
+  padding: 0.35rem 0;
+  font-size: 1rem;
+  line-height: 1.7rem;
+  color: #141414;
+  outline: none;
+}
+
+.faq-letter__input::placeholder {
+  color: #9ca3af;
+}
+
+.faq-letter__send {
+  align-self: flex-end;
+  margin-top: 0.4rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(20, 20, 20, 0.14);
+  background: #141414;
+  color: #f8f6f1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.55rem 1.15rem;
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+.faq-letter__send:hover:not(:disabled) {
+  background: #c45f12;
+}
+
+.faq-letter__send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Fold resets static 3D so the fold animation owns transform */
+.faq-mail--fold .faq-letter {
+  animation: letter-fold 700ms cubic-bezier(0.45, 0, 0.2, 1) forwards;
+}
+
+.faq-mail--envelope .faq-letter,
+.faq-mail--plane .faq-letter,
+.faq-mail--fly .faq-letter,
+.faq-mail--gone .faq-letter {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes letter-fold {
+  0% {
+    transform: perspective(900px) rotateX(5deg) rotateY(-4deg) scaleY(1)
+      translateY(0);
+    opacity: 1;
+  }
+  40% {
+    transform: perspective(900px) rotateX(35deg) rotateY(-2deg) scaleY(0.55)
+      translateY(8%);
+    opacity: 1;
+  }
+  75% {
+    transform: perspective(900px) rotateX(70deg) rotateY(0deg) scaleY(0.2)
+      translateY(18%);
+    opacity: 0.75;
+  }
+  100% {
+    transform: perspective(900px) rotateX(88deg) rotateY(0deg) scaleY(0.05)
+      translateY(28%);
+    opacity: 0;
+  }
+}
+
+.faq-mail-envelope {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 15rem;
+  height: 10rem;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+.faq-mail--envelope .faq-mail-envelope {
+  animation: envelope-in 550ms cubic-bezier(0.22, 1.15, 0.36, 1) forwards;
+}
+
+.faq-mail--plane .faq-mail-envelope {
+  animation: envelope-to-plane 480ms ease forwards;
+}
+
+.faq-mail-envelope__body {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(165deg, #f0ebe3 0%, #ddd8ce 55%, #d0cabd 100%);
+  border: 2px solid rgba(20, 20, 20, 0.18);
+  border-radius: 0.35rem;
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.4) inset,
+    0 16px 32px -12px rgba(20, 20, 20, 0.3);
+}
+
+.faq-mail-envelope__body::before {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 42%;
+  height: 1.5px;
+  background: rgba(20, 20, 20, 0.12);
+}
+
+.faq-mail-envelope__flap {
+  position: absolute;
+  left: -1px;
+  right: -1px;
+  top: -1px;
+  height: 55%;
+  background: linear-gradient(180deg, #e8e3d9, #cfc9bd);
+  border: 2px solid rgba(20, 20, 20, 0.16);
+  border-bottom: none;
+  clip-path: polygon(0 0, 50% 100%, 100% 0);
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  z-index: 2;
+}
+
+.faq-mail--envelope .faq-mail-envelope__flap {
+  animation: flap-close 500ms cubic-bezier(0.4, 0, 0.2, 1) forwards 120ms;
+}
+
+@keyframes envelope-in {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -30%) scale(0.55);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(-50%, -52%) scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes flap-close {
+  0% {
+    transform: rotateX(-110deg);
+  }
+  70% {
+    transform: rotateX(8deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+@keyframes envelope-to-plane {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.25) rotate(-25deg);
+  }
+}
+
+.faq-plane {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5.5rem;
+  height: 5.5rem;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.faq-plane__svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 8px 12px rgba(20, 20, 20, 0.28));
+}
+
+.faq-mail--plane .faq-plane {
+  animation: plane-form 450ms cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
+}
+
+.faq-mail--fly .faq-plane {
+  animation: plane-fly 1100ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes plane-form {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2) rotate(-40deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes plane-fly {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+  20% {
+    transform: translate(5%, -40%) rotate(-12deg) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(220%, -280%) rotate(-35deg) scale(0.55);
+  }
+}
+
+/* --- CTA void: right edge → up to the button only --- */
+.cta-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-row {
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+
+.cta-void {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .cta-void {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 55%;
+    pointer-events: none;
+    z-index: 0;
+    -webkit-mask-image: linear-gradient(
+      to left,
+      #000 0%,
+      #000 55%,
+      rgba(0, 0, 0, 0.5) 80%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to left,
+      #000 0%,
+      #000 55%,
+      rgba(0, 0, 0, 0.5) 80%,
+      transparent 100%
+    );
+  }
+
+  .cta-void__media {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+}
+
+/* Pull toward the void (right) — more noticeable */
+.cta-resist {
+  position: relative;
+  z-index: 1;
+  animation: cta-resist 3.2s ease-in-out infinite;
+}
+
+.cta-resist--flying {
+  animation: none !important;
+}
+
+@keyframes cta-resist {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  35% {
+    transform: translateX(14px);
+  }
+  48% {
+    transform: translateX(18px);
+  }
+  62% {
+    transform: translateX(6px);
+  }
+  78% {
+    transform: translateX(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-resist,
+  .faq-mail--fold .faq-letter,
+  .faq-mail--envelope .faq-mail-envelope,
+  .faq-mail--plane .faq-plane,
+  .faq-mail--fly .faq-plane {
+    animation: none !important;
+  }
+
+  .faq-letter {
+    transform: none;
+  }
+
+  .faq-letter__thickness {
+    display: none;
+  }
+}

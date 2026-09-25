@@ -21,11 +21,14 @@ function formatDate(iso: string): string {
 }
 
 export default async function BlogIndexPage() {
-  const posts = await getBlogPosts();
+  const [posts, siteConfig] = await Promise.all([
+    getBlogPosts(),
+    getSiteConfig(),
+  ]);
 
   return (
     <>
-      <SiteHeader />
+      <SiteHeader productName={siteConfig.productName} />
       <main>
         <section className="section py-16">
           <p className="eyebrow">Blog</p>
@@ -41,7 +44,7 @@ export default async function BlogIndexPage() {
                 <Link
                   key={post.id}
                   href={`/blog/${post.slug}`}
-                  className="card block transition hover:border-ink/30"
+                  className="card block transition-opacity hover:opacity-90"
                 >
                   {post.cover_image_url && (
                     // eslint-disable-next-line @next/next/no-img-element

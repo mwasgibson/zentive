@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type ApiEndpoint = {
   method: string;
@@ -14,36 +14,84 @@ type LogLine = {
   text: string;
 };
 
+const IDLE_START_MS = 4200;
+const DEMO_STEP_MS = 2500;
+const DEMO_LOOP_MS = 1200;
+
+function shortPath(path: string) {
+  return path.replace(/^\/v1/, "") || path;
+}
+
+function shortDesc(desc: string) {
+  if (desc.length <= 28) return desc;
+  return desc.slice(0, 26).trimEnd() + "…";
+}
+
+function pickThree<T>(items: T[]): T[] {
+  if (items.length === 0) return [];
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, Math.min(3, copy.length));
+}
+
 export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
   const [input, setInput] = useState("");
   const [logs, setLogs] = useState<LogLine[]>([]);
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(0);
+  const focusedRef = useRef(false);
+  const hasInteractedRef = useRef(false);
+  const inViewRef = useRef(true);
+  const endpointsRef = useRef(endpoints);
+  endpointsRef.current = endpoints;
+  const timersRef = useRef<number[]>([]);
 
-  useEffect(() => {
-    // Initial welcome + list endpoints once
+  const clearTimers = useCallback(() => {
+    timersRef.current.forEach((t) => window.clearTimeout(t));
+    timersRef.current = [];
+  }, []);
+
+  const markInteracted = useCallback(() => {
+    hasInteractedRef.current = true;
+    clearTimers();
+  }, [clearTimers]);
+
+  const pushLog = useCallback((type: LogLine["type"], text: string) => {
+    setLogs((prev) => [...prev, { id: idRef.current++, type, text }]);
+  }, []);
+
+  const seedWelcome = useCallback(() => {
+    const list = endpointsRef.current;
     const initial: LogLine[] = [
       {
         id: idRef.current++,
         type: "info",
-        text: "terminal — type 'help' for available commands",
+        text: "terminal — type 'help'",
       },
       {
         id: idRef.current++,
         type: "muted",
-        text: "registered endpoints:",
+        text: "endpoints:",
       },
-      ...endpoints.map((e) => ({
+      ...list.map((e) => ({
         id: idRef.current++,
         type: "success" as const,
-        text: `${e.method.padEnd(6)} ${e.path} — ${e.desc}`,
+        text: `${e.method.padEnd(5)} ${shortPath(e.path)} — ${shortDesc(e.desc)}`,
       })),
     ];
     setLogs(initial);
-  }, [endpoints]);
+  }, []);
+
+  useEffect(() => {
+    seedWelcome();
+  }, [endpoints, seedWelcome]);
 
   useEffect(() => {
     containerRef.current?.scrollTo({
@@ -52,95 +100,190 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
     });
   }, [logs]);
 
-  const runCommand = (cmdRaw: string) => {
-    const cmd = cmdRaw.trim();
-    if (!cmd) return;
+  const runCommand = useCallback(
+    (cmdRaw: string) => {
+      const cmd = cmdRaw.trim();
+      if (!cmd) return;
 
-    setLogs((prev) => [
-      ...prev,
-      { id: idRef.current++, type: "info", text: `user@usersmac ~ % ${cmd}` },
-    ]);
-
-    const [command, ...args] = cmd.split(/\s+/);
-    const lower = command.toLowerCase();
-
-    const response: {
-      type: "info" | "error" | "success" | "muted";
-      text: string;
-    }[] = [];
-
-    switch (lower) {
-      case "help":
-        response.push({
-          type: "info",
-          text: "available commands: help, endpoints, curl <path>, clear, echo <text>",
-        });
-        break;
-
-      case "endpoints":
-        response.push({
-          type: "muted",
-          text: "registered endpoints:",
-        });
-        endpoints.forEach((e) => {
-          response.push({
-            type: "success",
-            text: `${e.method.padEnd(6)} ${e.path} — ${e.desc}`,
-          });
-        });
-        break;
-
-      case "curl": {
-        const path = args[0];
-        if (!path) {
-          response.push({
-            type: "error",
-            text: "usage: curl <path>  (e.g. curl /v1/send)",
-          });
-        } else {
-          const match = endpoints.find((e) => e.path === path);
-          if (!match) {
-            response.push({
-              type: "error",
-              text: `no endpoint found for path: ${path}`,
-            });
-          } else {
-            response.push({
-              type: "success",
-              text:
-                `curl -X ${match.method} "https://api.sh${match.path}"\n` +
-                `# ${match.desc}`,
-            });
-          }
-        }
-        break;
+      if (cmd.toLowerCase() === "clear") {
+        pushLog("info", `user@usersmac ~ % clear`);
+        window.setTimeout(() => setLogs([]), 180);
+        return;
       }
 
-      case "clear":
-        setLogs([]);
-        return;
+      pushLog("info", `user@usersmac ~ % ${cmd}`);
 
-      case "echo":
-        response.push({
-          type: "info",
-          text: args.join(" ") || "",
-        });
-        break;
+      const [command, ...args] = cmd.split(/\s+/);
+      const lower = command.toLowerCase();
+      const list = endpointsRef.current;
 
-      default:
-        response.push({
-          type: "error",
-          text: `unknown command: ${command}. type 'help' for options.`,
-        });
+      switch (lower) {
+        case "help":
+          pushLog(
+            "info",
+            "commands: help, endpoints, curl <path>, clear, echo <text>",
+          );
+          break;
+
+        case "endpoints":
+          pushLog("muted", "endpoints:");
+          list.forEach((e) => {
+            pushLog(
+              "success",
+              `${e.method.padEnd(5)} ${shortPath(e.path)} — ${shortDesc(e.desc)}`,
+            );
+          });
+          break;
+
+        case "curl": {
+          const pathArg = args[0];
+          if (!pathArg) {
+            pushLog("error", "usage: curl <path>");
+            break;
+          }
+          const match = list.find(
+            (e) =>
+              e.path === pathArg ||
+              shortPath(e.path) === pathArg ||
+              e.path ===
+                `/v1${pathArg.startsWith("/") ? pathArg : `/${pathArg}`}`,
+          );
+          if (!match) {
+            pushLog("error", `no endpoint: ${pathArg}`);
+          } else {
+            pushLog(
+              "success",
+              `curl -X ${match.method} "https://api.sh${match.path}"`,
+            );
+            pushLog("muted", `# ${shortDesc(match.desc)}`);
+          }
+          break;
+        }
+
+        case "echo":
+          pushLog("info", args.join(" ") || "");
+          break;
+
+        default:
+          pushLog("error", `unknown: ${command}. type 'help'`);
+      }
+    },
+    [pushLog],
+  );
+
+  const scheduleIdleCycle = useCallback(() => {
+    clearTimers();
+    if (!inViewRef.current || focusedRef.current || hasInteractedRef.current) {
+      return;
     }
 
-    setLogs((prev) => [
-      ...prev,
-      ...response.map((r) => ({ id: idRef.current++, ...r })),
-    ]);
+    const start = window.setTimeout(() => {
+      if (
+        !inViewRef.current ||
+        focusedRef.current ||
+        hasInteractedRef.current
+      ) {
+        return;
+      }
+
+      const picks = pickThree(endpointsRef.current);
+      if (picks.length === 0) return;
+
+      picks.forEach((ep, i) => {
+        const t = window.setTimeout(
+          () => {
+            if (
+              !inViewRef.current ||
+              focusedRef.current ||
+              hasInteractedRef.current
+            ) {
+              return;
+            }
+            runCommand(`curl ${shortPath(ep.path)}`);
+
+            if (i === picks.length - 1) {
+              const clearT = window.setTimeout(() => {
+                if (
+                  !inViewRef.current ||
+                  focusedRef.current ||
+                  hasInteractedRef.current
+                ) {
+                  return;
+                }
+                runCommand("clear");
+
+                const loopT = window.setTimeout(() => {
+                  if (
+                    !inViewRef.current ||
+                    focusedRef.current ||
+                    hasInteractedRef.current
+                  ) {
+                    return;
+                  }
+                  hasInteractedRef.current = false;
+                  scheduleIdleCycle();
+                }, DEMO_LOOP_MS);
+                timersRef.current.push(loopT);
+              }, DEMO_STEP_MS);
+              timersRef.current.push(clearT);
+            }
+          },
+          DEMO_STEP_MS * (i + 1),
+        );
+        timersRef.current.push(t);
+      });
+    }, IDLE_START_MS);
+
+    timersRef.current.push(start);
+  }, [clearTimers, runCommand]);
+
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const nowInView = entry.isIntersecting;
+        const wasInView = inViewRef.current;
+        inViewRef.current = nowInView;
+
+        if (!nowInView) {
+          clearTimers();
+          return;
+        }
+
+        if (!wasInView && nowInView) {
+          hasInteractedRef.current = false;
+          focusedRef.current = false;
+          seedWelcome();
+          scheduleIdleCycle();
+        }
+      },
+      { threshold: 0.25 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [clearTimers, seedWelcome, scheduleIdleCycle]);
+
+  useEffect(() => {
+    scheduleIdleCycle();
+    return () => clearTimers();
+  }, [scheduleIdleCycle, clearTimers]);
+
+  const onFocus = () => {
+    focusedRef.current = true;
+    markInteracted();
+  };
+
+  const onBlur = () => {
+    focusedRef.current = false;
+    hasInteractedRef.current = false;
+    if (inViewRef.current) scheduleIdleCycle();
   };
 
   const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+    markInteracted();
     if (e.key === "Enter") {
       e.preventDefault();
       const cmd = input;
@@ -173,8 +316,7 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
   };
 
   return (
-    <div className="card overflow-hidden bg-ink !p-0">
-      {/* Terminal header */}
+    <div ref={rootRef} className="card overflow-hidden bg-ink !p-0">
       <div className="flex items-center justify-between border-b border-paper/10 px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
@@ -182,19 +324,20 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
           <span className="h-2.5 w-2.5 rounded-full bg-green-500/80" />
         </div>
         <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-paper/50">
-          api.sh
+          api.sh · open box
         </div>
       </div>
 
-      {/* Terminal body */}
       <div
         ref={containerRef}
         className="relative max-h-[22rem] overflow-y-auto"
-        onClick={() => inputRef.current?.focus()}
+        onClick={() => {
+          markInteracted();
+          inputRef.current?.focus();
+        }}
       >
         <div className="absolute inset-0 api-scanlines" />
-        <div className="relative px-4 py-3">
-          {/* Logs (including static endpoint list + command output) */}
+        <div className="relative z-[1] px-4 py-3">
           {logs.map((log) => (
             <div
               key={log.id}
@@ -213,16 +356,20 @@ export function TerminalApi({ endpoints }: { endpoints: ApiEndpoint[] }) {
             </div>
           ))}
 
-          {/* Prompt + input */}
           <div className="mt-2 flex items-center gap-2 font-mono text-[12.5px]">
             <span className="text-wire">user@usersmac ~ %</span>
             <input
               ref={inputRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                markInteracted();
+                setInput(e.target.value);
+              }}
+              onFocus={onFocus}
+              onBlur={onBlur}
               onKeyDown={onKeyDown}
               className="flex-1 bg-transparent text-paper outline-none placeholder:text-paper/30"
-              placeholder="type 'help' or 'curl /v1/send'…"
+              placeholder="type 'help' or 'curl /sms/send'…"
               spellCheck={false}
               autoComplete="off"
             />
