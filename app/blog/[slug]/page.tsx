@@ -15,9 +15,13 @@ export async function generateMetadata({
   const post = await getBlogPost(slug);
   if (!post) return {};
 
+  const siteConfig = await getSiteConfig();
   return {
     title: post.seo_title || post.title,
     description: post.seo_description || post.excerpt || undefined,
+    alternates: {
+      canonical: `${siteConfig.domain}/blog/${slug}`,
+    },
     openGraph: post.cover_image_url
       ? { images: [post.cover_image_url] }
       : undefined,
@@ -71,7 +75,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={post.cover_image_url}
-              alt=""
+              alt={post.title}
               className="mt-8 aspect-video w-full rounded-lg object-cover"
             />
           )}
