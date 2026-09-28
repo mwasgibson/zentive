@@ -63,7 +63,6 @@
   min-height: 20rem;
   max-width: 28rem;
   width: 100%;
-  perspective: 900px;
 }
 
 .faq-mail {
@@ -75,7 +74,6 @@
 .faq-letter {
   position: relative;
   z-index: 2;
-  isolation: isolate;
   border: 1.5px solid rgba(20, 20, 20, 0.12);
   background:
     repeating-linear-gradient(
@@ -96,7 +94,6 @@
     100% 100%;
   border-radius: 0.35rem 0.35rem 0.75rem 0.75rem;
   padding: 1.4rem 1.35rem 1.25rem;
-  /* Depth via shadow + thickness only — rotateX/Y broke input hit-testing */
   transform-origin: center top;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.9) inset,
@@ -121,20 +118,22 @@
     0 10px 20px -8px rgba(20, 20, 20, 0.18);
 }
 
-/* Soft face highlight — must never steal clicks */
+/* Corner highlight only — full-face mix-blend hid the caret */
 .faq-letter__edge {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 55%;
+  height: 40%;
   border-radius: inherit;
   pointer-events: none;
   z-index: 0;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.5) 0%,
-    rgba(255, 255, 255, 0.1) 30%,
-    transparent 55%
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.08) 45%,
+    transparent 70%
   );
-  mix-blend-mode: soft-light;
 }
 
 .faq-letter__crease {
@@ -161,58 +160,72 @@
 
 .faq-letter__form {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
   pointer-events: auto;
+  /* Isolate form from parent effects so caret paints normally */
+  isolation: isolate;
 }
 
 .faq-letter__field {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   width: 100%;
   border: none;
   border-bottom: 1.5px solid rgba(20, 20, 20, 0.14);
-  background: transparent;
-  padding: 0.5rem 0;
+  background: rgba(255, 255, 255, 0.35);
+  padding: 0.5rem 0.35rem;
   font-size: 1rem;
+  line-height: 1.4;
   color: #141414;
+  caret-color: #141414;
   outline: none;
   pointer-events: auto;
+  -webkit-text-fill-color: #141414;
 }
 
 .faq-letter__field:focus {
   border-bottom-color: rgba(226, 113, 29, 0.55);
+  background: rgba(255, 255, 255, 0.55);
 }
 
 .faq-letter__field::placeholder {
   color: #9ca3af;
+  -webkit-text-fill-color: #9ca3af;
 }
 
 .faq-letter__input {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   width: 100%;
   min-height: 5.5rem;
   resize: none;
   border: none;
-  background: transparent;
-  padding: 0.35rem 0;
+  background: rgba(255, 255, 255, 0.35);
+  padding: 0.35rem;
   font-size: 1rem;
   line-height: 1.7rem;
   color: #141414;
+  caret-color: #141414;
   outline: none;
   pointer-events: auto;
+  -webkit-text-fill-color: #141414;
+}
+
+.faq-letter__input:focus {
+  background: rgba(255, 255, 255, 0.55);
 }
 
 .faq-letter__input::placeholder {
   color: #9ca3af;
+  -webkit-text-fill-color: #9ca3af;
 }
 
 .faq-letter__send {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   align-self: flex-end;
   margin-top: 0.4rem;
   border-radius: 9999px;
