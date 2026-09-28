@@ -9,6 +9,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Blog",
     description: `Notes on bulk SMS infrastructure in Kenya, from the ${siteConfig.productName} team.`,
+    alternates: {
+      canonical: `${siteConfig.domain}/blog`,
+    },
   };
 }
 
@@ -50,7 +53,7 @@ export default async function BlogIndexPage() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={post.cover_image_url}
-                      alt=""
+                      alt={post.title}
                       className="mb-4 aspect-video w-full rounded-lg object-cover"
                     />
                   )}
